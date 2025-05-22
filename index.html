@@ -34,12 +34,25 @@
       display: block;
     }
 
+    h2 {
+      font-size: 28px;
+      font-weight: bold;
+      color: #222;
+      background: #fff;
+      display: inline-block;
+      padding: 16px 24px;
+      border-radius: 10px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+      margin-bottom: 30px;
+    }
+
     input, select, button {
-      margin: 10px 0;
-      padding: 10px;
+      margin: 12px auto;
+      padding: 12px;
       width: 90%;
       max-width: 400px;
       font-size: 16px;
+      display: block;
     }
 
     button {
@@ -48,18 +61,27 @@
       border: none;
       font-weight: bold;
       cursor: pointer;
+      font-size: 16px;
+      border-radius: 6px;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
     }
 
     #videoNote {
+      background: #fff;
+      padding: 16px;
+      margin: 20px auto;
+      border-radius: 10px;
+      max-width: 600px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
       font-size: 18px;
       font-weight: bold;
-      margin: 20px 0;
+      color: #222;
+      white-space: pre-line;
     }
 
-    iframe {
-      border: none;
-      width: 100vw;
-      height: 100vh;
+    video {
+      width: 100%;
+      max-height: 90vh;
     }
 
     #completionSection {
@@ -71,41 +93,36 @@
       padding: 20px;
       border-radius: 8px;
       box-shadow: 0 0 10px #ccc;
+      display: none;
     }
   </style>
 </head>
 <body>
 
-  <!-- Language Selection -->
   <div id="languageSection" class="section active">
-    <h2>Choose Language / Chagua Lugha</h2>
+    <h2>Select Language</h2>
     <select id="languageSelect" required>
-      <option value="">Select Language</option>
+      <option value="">-- Choose a Language --</option>
       <option value="Swahili">Swahili</option>
-      <option value="Bemba">Bemba</option>
+      <option value="English">English</option>
       <option value="Portuguese">Portuguese</option>
-    </select><br>
+    </select>
     <button onclick="proceedToForm()">Continue</button>
   </div>
 
-  <!-- Check-In Form -->
   <form id="checkinForm" class="section">
     <h2 id="formTitle">Driver Check-In</h2>
-    <input type="text" id="name" placeholder="Full Name" required><br>
-    <input type="text" id="truck" placeholder="Truck Number" required><br>
+    <input type="text" id="name" placeholder="Full Name" required>
+    <input type="text" id="truck" placeholder="Truck Number" required>
     <button type="submit" id="submitBtn">Submit and Watch Video</button>
   </form>
 
-  <!-- Video Section -->
   <div id="videoSection" class="section">
     <div id="videoNote"></div>
-    <div>
-      <iframe id="videoFrame" src="" allowfullscreen></iframe>
-    </div>
+    <video id="trainingVideo" controls autoplay></video>
   </div>
 
-  <!-- Completion Button -->
-  <div id="completionSection" class="section">
+  <div id="completionSection">
     <button id="completeBtn">✅ Mark as Completed</button>
   </div>
 
@@ -118,12 +135,12 @@
         submitBtn: "Tuma na Tazama Video",
         completeBtn: "✅ Nimekamilisha Kozi"
       },
-      Bemba: {
-        formTitle: "Ukufwaya kwa Ba Driver",
-        namePlaceholder: "Ishina lyobe lyonse",
-        truckPlaceholder: "Inamba ya Motoka",
-        submitBtn: "Fuma no Kutamba Video",
-        completeBtn: "✅ Nasheya Ukufwaya"
+      English: {
+        formTitle: "Driver Check-In",
+        namePlaceholder: "Full Name",
+        truckPlaceholder: "Truck Number",
+        submitBtn: "Submit and Watch Video",
+        completeBtn: "✅ Mark as Completed"
       },
       Portuguese: {
         formTitle: "Registro do Motorista",
@@ -136,39 +153,30 @@
 
     const videoLinks = {
       Swahili: {
-        url: "https://drive.google.com/file/d/1yzq77EVdkgTDgox0bedDsqQYMtwlGA0A/preview",
+        url: "https://raw.githubusercontent.com/Kwibu/API-3-Test/main/Safety%20Campaign%20for%20drivers%20(Swahili).mp4",
         title: "Kampeni ya Usalama kwa Madereva",
-        duration: 131,
         note: "Tafadhali tazama video yote. Baada ya sekunde 10 kabla ya video kuisha, kitufe cha kukamilisha kozi kitaonekana."
       },
-      Bemba: {
-        url: "https://drive.google.com/file/d/16RXZa6L1rCN9VADlUWkTxw_AZVVBhQ7N/preview",
-        title: "Driver Safety Campaign (Bemba)",
-        duration: 115,
+      English: {
+        url: "https://raw.githubusercontent.com/Kwibu/API-3-Test/main/Safety%20Campaign%20for%20drivers%20(English).mp4",
+        title: "Driver Safety Campaign",
         note: "Please watch the full video. 10 seconds before it ends, the button to mark completion will appear."
       },
       Portuguese: {
-        url: "https://drive.google.com/file/d/1UAXYH9mVzidWLvk97JVrQzsQlQn2Om48/preview",
+        url: "https://raw.githubusercontent.com/Kwibu/API-3-Test/main/Safety%20Campaign%20for%20drivers%20(Portugal).mp4",
         title: "Campanha de Segurança para Motoristas",
-        duration: 80,
         note: "Assista ao vídeo completo. Faltando 10 segundos, aparecerá o botão de conclusão."
       }
     };
 
     let selectedLanguage = "";
-    let startTime, rowId;
 
     function proceedToForm() {
       const lang = document.getElementById("languageSelect").value;
-      if (!lang) {
-        alert("Please select a language.");
-        return;
-      }
-
+      if (!lang) return alert("Please select a language.");
       selectedLanguage = lang;
-      const t = translations[lang];
 
-      // Set localized text
+      const t = translations[lang];
       document.getElementById("formTitle").innerText = t.formTitle;
       document.getElementById("name").placeholder = t.namePlaceholder;
       document.getElementById("truck").placeholder = t.truckPlaceholder;
@@ -179,70 +187,23 @@
       document.getElementById("checkinForm").classList.add("active");
     }
 
-    document.getElementById("checkinForm").addEventListener("submit", async function(e) {
+    document.getElementById("checkinForm").addEventListener("submit", function(e) {
       e.preventDefault();
-
-      const name = document.getElementById("name").value.trim();
-      const truck = document.getElementById("truck").value.trim();
       const lang = selectedLanguage;
       const video = videoLinks[lang];
+      const videoEl = document.getElementById("trainingVideo");
+      videoEl.src = video.url;
 
-      if (!name || !truck) {
-        alert("Please fill out all fields.");
-        return;
-      }
-
-      const totalDurationMs = video.duration * 1000;
-      const buttonRevealTime = totalDurationMs - 10000;
-      startTime = new Date();
-
-      const formData = new FormData();
-      formData.append("name", name);
-      formData.append("truck", truck);
-      formData.append("language", lang);
-      formData.append("videoTitle", video.title);
-      formData.append("status", "Course Started");
-
-      const response = await fetch('https://script.google.com/macros/s/AKfycbzUy3d6QTbXcjh-kq0O8OsnKQGrMsQlE9CXSzfwiVbc19avtjsCPP3wA9hjd-CikNZJ/exec', {
-        method: "POST",
-        body: formData
-      });
-
-      const result = await response.json();
-      rowId = result.row;
-
-      document.getElementById("checkinForm").classList.remove("active");
       document.getElementById("videoNote").innerText = `(${video.title})\n${video.note}`;
-      document.getElementById("videoFrame").src = video.url;
+      document.getElementById("checkinForm").classList.remove("active");
       document.getElementById("videoSection").classList.add("active");
 
-      setTimeout(() => {
-        document.getElementById("completionSection").classList.add("active");
-      }, buttonRevealTime);
-    });
-
-    document.getElementById("completeBtn").addEventListener("click", async () => {
-      const name = document.getElementById("name").value.trim();
-      const truck = document.getElementById("truck").value.trim();
-      const videoTitle = videoLinks[selectedLanguage].title;
-      const duration = Math.round((new Date() - startTime) / 60000) + " minutes";
-
-      const data = new FormData();
-      data.append("name", name);
-      data.append("truck", truck);
-      data.append("videoTitle", videoTitle);
-      data.append("status", "Completed");
-      data.append("duration", duration);
-      data.append("rowId", rowId);
-
-      await fetch('https://script.google.com/macros/s/AKfycbzUy3d6QTbXcjh-kq0O8OsnKQGrMsQlE9CXSzfwiVbc19avtjsCPP3wA9hjd-CikNZJ/exec', {
-        method: "POST",
-        body: data
+      videoEl.addEventListener("timeupdate", () => {
+        if (videoEl.duration - videoEl.currentTime <= 10) {
+          document.getElementById("completionSection").style.display = "block";
+        }
       });
-
-      document.getElementById("completionSection").innerHTML = "<h3>✅ Course marked as completed!</h3>";
     });
   </script>
-
 </body>
 </html>
