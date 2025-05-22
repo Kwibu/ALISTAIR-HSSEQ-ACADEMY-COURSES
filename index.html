@@ -2,6 +2,7 @@
 <html>
 <head>
   <title>Driver Check-In</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <style>
     html, body {
       margin: 0;
@@ -133,21 +134,24 @@
         namePlaceholder: "Jina Kamili",
         truckPlaceholder: "Namba ya Gari",
         submitBtn: "Tuma na Tazama Video",
-        completeBtn: "✅ Nimekamilisha Kozi"
+        completeBtn: "✅ Nimekamilisha Kozi",
+        completeMsg: "✅ Kozi imekamilishwa kwa mafanikio!"
       },
       Bemba: {
         formTitle: "Ukufwaya kwa Ba Driver",
         namePlaceholder: "Ishina lyobe lyonse",
         truckPlaceholder: "Inamba ya Motoka",
         submitBtn: "Fuma no Kutamba Video",
-        completeBtn: "✅ Nasheya Ukufwaya"
+        completeBtn: "✅ Nasheya Ukufwaya",
+        completeMsg: "✅ Ukufwaya wapwa bwino!"
       },
       Portuguese: {
         formTitle: "Registro do Motorista",
         namePlaceholder: "Nome Completo",
         truckPlaceholder: "Número do Caminhão",
         submitBtn: "Enviar e Assistir ao Vídeo",
-        completeBtn: "✅ Marcar como Concluído"
+        completeBtn: "✅ Marcar como Concluído",
+        completeMsg: "✅ Curso concluído com sucesso!"
       }
     };
 
@@ -159,7 +163,7 @@
       },
       Bemba: {
         url: "https://raw.githubusercontent.com/Kwibu/API-3-Test/main/Safety%20Campaign%20for%20drivers%20(English).mp4",
-        title: "Driver Safety Campaign",
+        title: "Driver Safety Campaign (Bemba)",
         note: "Tufweniko filyo video yonse. Pali sekonde 10 ukupwa, akabuto ako ku mark uko kufwaya kwapwa kalatampako."
       },
       Portuguese: {
@@ -247,7 +251,7 @@
 
       const result = await response.json();
       if (result.success) {
-        document.getElementById("completionSection").innerHTML = "<h3>✅ " + result.message + "</h3>";
+        document.getElementById("completionSection").innerHTML = `<h3>${translations[lang].completeMsg}</h3>`;
       } else {
         alert("⚠️ Failed to mark as complete: " + result.message);
       }
