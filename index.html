@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Driver Check-In</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      padding-top: 100px;
+    }
+    form, #completionSection {
+      display: inline-block;
+      padding: 30px;
+      background-color: #f2f2f2;
+      border-radius: 10px;
+      box-shadow: 0 0 10px #ccc;
+      margin-top: 20px;
+    }
+    input, select, button {
+      margin: 10px 0;
+      padding: 10px;
+      width: 100%;
+      max-width: 300px;
+    }
+    button {
+      background-color: #4CAF50;
+      color: white;
+      border: none;
+      font-weight: bold;
+      cursor: pointer;
+    }
+    #completionSection {
+      display: none;
+    }
+  </style>
+</head>
+<body>
+
+  <form id="checkinForm">
+    <h2>Driver Check-In</h2>
+    <input type="text" id="name" name="name" placeholder="Full Name" required><br>
+    <input type="text" id="truck" name="truck" placeholder="Truck Number" required><br>
+    <select id="language" name="language" required>
+      <option value="">Select Language</option>
+      <option value="Swahili">Swahili</option>
+      <option value="English">English</option>
+      <option value="Portuguese">Portuguese</option>
+    </select><br>
+    <button type="submit">Submit and Watch Video</button>
+  </form>
+
+  <div id="completionSection">
+    <h3>After watching the course, click below:</h3>
+    <button id="completeBtn">Mark as Completed</button>
+  </div>
+
+  <script>
+    const videoLinks = {
+      Swahili: {
+        url: "https://drive.google.com/file/d/11dizfdhwsutrjiVhZbkSqJEz7q0OwscD/view?usp=drive_link",
+        title: "Kozi ya Usalama"
+      },
+      English: {
+        url: "https://drive.google.com/file/d/1xu_BSP2XHLTDGFmGQ5h_eB_kI0XRGlZB/view?usp=sharing",
+        title: "HSSEQ Safety Course"
+      },
+      Portuguese: {
+        url: "https://docs.google.com/presentation/d/1UCQxegTbqeaDNUK_9FA25s-1eCi2ySWYrjQTeqpL4Fo/edit?usp=sharing",
+        title: "Curso de Segurança"
+      }
+    };
+
+    let formDataGlobal = {};
+    let startTime;
+
+    document.getElementById('checkinForm').addEventListener('submit', function(e) {
+      e.preventDefault();
+
+      const name = document.getElementById('name').value.trim();
+      const truck = document.getElementById('truck').value.trim();
+      const language = document.getElementById('language').value;
+
+      if (!videoLinks[language]) {
+        alert("Please select a valid language.");
+        return;
+      }
+
+      const videoInfo = videoLinks[language];
+      formDataGlobal = { name, truck, language, videoTitle: videoInfo.title };
+      startTime = new Date();
+
+      const formData = new FormData();
+      formData.append('name', name);
+      formData.append('truck', truck);
+      formData.append('language', language);
+      formData.append('videoTitle', videoInfo.title);
+      formData.append('status', 'Course Started');
+
+      fetch('https://script.google.com/macros/s/AKfycbzUy3d6QTbXcjh-kq0O8OsnKQGrMsQlE9CXSzfwiVbc19avtjsCPP3wA9hjd-CikNZJ/exec', {
+        method: 'POST',
+        body: formData
+      });
+
+      window.open(videoInfo.url, '_blank');
+      document.getElementById('completionSection').style.display = 'block';
+    });
+
+    document.getElementById('completeBtn').addEventListener('click', () => {
+      const endTime = new Date();
+      const durationMinutes = Math.round((endTime - startTime) / 60000);
+
+      const data = new FormData();
+      data.append('name', formDataGlobal.name);
+      data.append('truck', formDataGlobal.truck);
+      data.append('language', formDataGlobal.language);
+      data.append('videoTitle', formDataGlobal.videoTitle);
+      data.append('status', 'Completed');
+      data.append('duration', durationMinutes + ' minutes');
+
+      fetch('https://script.google.com/macros/s/AKfycbzUy3d6QTbXcjh-kq0O8OsnKQGrMsQlE9CXSzfwiVbc19avtjsCPP3wA9hjd-CikNZJ/exec', {
+        method: 'POST',
+        body: data
+      }).then(() => {
+        document.getElementById('completionSection').innerHTML = "<h3>✅ Thank you for completing the course!</h3>";
+      }).catch(() => {
+        alert("❌ Failed to submit completion.");
+      });
+    });
+  </script>
+
+</body>
+</html>
