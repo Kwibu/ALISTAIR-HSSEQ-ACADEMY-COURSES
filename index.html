@@ -7,15 +7,16 @@
     body {
       font-family: Arial, sans-serif;
       text-align: center;
-      padding-top: 100px;
+      padding-top: 50px;
     }
-    form, #completionSection {
+    form, #completionSection, #videoSection {
       display: inline-block;
       padding: 30px;
       background-color: #f2f2f2;
       border-radius: 10px;
       box-shadow: 0 0 10px #ccc;
       margin-top: 20px;
+      max-width: 600px;
     }
     input, select, button {
       margin: 10px 0;
@@ -30,8 +31,13 @@
       font-weight: bold;
       cursor: pointer;
     }
-    #completionSection {
+    #completionSection, #videoSection {
       display: none;
+    }
+    iframe {
+      width: 100%;
+      height: 315px;
+      margin-top: 20px;
     }
   </style>
 </head>
@@ -47,32 +53,38 @@
       <option value="English">English</option>
       <option value="Portuguese">Portuguese</option>
     </select><br>
+    <input type="number" id="videoMinutes" value="1" min="0" required> minutes<br>
+    <input type="number" id="videoSeconds" value="38" min="0" max="59" required> seconds<br>
     <button type="submit">Submit and Watch Video</button>
   </form>
 
+  <div id="videoSection">
+    <h3>Watch the Course Below:</h3>
+    <iframe id="videoFrame" src="" frameborder="0" allowfullscreen></iframe>
+  </div>
+
   <div id="completionSection">
     <h3>Click below to confirm you watched the course:</h3>
-    <button id="completeBtn" disabled>Mark as Completed</button>
+    <button id="completeBtn">Mark as Completed</button>
   </div>
 
   <script>
     const videoLinks = {
       Swahili: {
-        url: "https://drive.google.com/file/d/11dizfdhwsutrjiVhZbkSqJEz7q0OwscD/view?usp=drive_link",
+        url: "https://drive.google.com/file/d/11dizfdhwsutrjiVhZbkSqJEz7q0OwscD/preview",
         title: "Kozi ya Usalama"
       },
       English: {
-        url: "https://drive.google.com/file/d/1xu_BSP2XHLTDGFmGQ5h_eB_kI0XRGlZB/view?usp=sharing",
+        url: "https://drive.google.com/file/d/1xu_BSP2XHLTDGFmGQ5h_eB_kI0XRGlZB/preview",
         title: "HSSEQ Safety Course"
       },
       Portuguese: {
-        url: "https://docs.google.com/presentation/d/1UCQxegTbqeaDNUK_9FA25s-1eCi2ySWYrjQTeqpL4Fo/edit?usp=sharing",
+        url: "https://docs.google.com/presentation/d/e/2PACX-1vTjzXq7ULZZ6UeJ3EUM/preview",
         title: "Curso de Segurança"
       }
     };
 
     let startTime, rowId;
-    let autoCompleteTimeout;
 
     document.getElementById('checkinForm').addEventListener('submit', async function(e) {
       e.preventDefault();
@@ -80,12 +92,15 @@
       const name = document.getElementById('name').value.trim();
       const truck = document.getElementById('truck').value.trim();
       const language = document.getElementById('language').value;
+      const minutes = parseInt(document.getElementById('videoMinutes').value, 10);
+      const seconds = parseInt(document.getElementById('videoSeconds').value, 10);
 
-      if (!name || !truck || !language || !videoLinks[language]) {
-        alert("All fields are required.");
+      if (!name || !truck || !language || !videoLinks[language] || isNaN(minutes) || isNaN(seconds)) {
+        alert("Please fill out all fields with valid duration.");
         return;
       }
 
+      const totalDurationMs = (minutes * 60 + seconds) * 1000;
       const video = videoLinks[language];
       startTime = new Date();
 
@@ -104,27 +119,22 @@
       const result = await response.json();
       rowId = result.row;
 
-      window.open(video.url, '_blank');
-      document.getElementById('completionSection').style.display = 'block';
-      setTimeout(() => {
-        document.getElementById('completeBtn').disabled = false;
-      }, 40000);
+      document.getElementById('videoFrame').src = video.url;
+      document.getElementById('videoSection').style.display = 'block';
 
-      autoCompleteTimeout = setTimeout(() => {
-        submitCompletion(name, truck, video.title);
-      }, 70000);
+      setTimeout(() => {
+        document.getElementById('videoSection').style.display = 'none';
+        document.getElementById('completionSection').style.display = 'block';
+      }, totalDurationMs);
     });
 
-    document.getElementById('completeBtn').addEventListener('click', () => {
-      clearTimeout(autoCompleteTimeout);
+    document.getElementById('completeBtn').addEventListener('click', async () => {
       const name = document.getElementById('name').value.trim();
       const truck = document.getElementById('truck').value.trim();
-      const videoTitle = videoLinks[document.getElementById('language').value].title;
-      submitCompletion(name, truck, videoTitle);
-    });
-
-    async function submitCompletion(name, truck, videoTitle) {
+      const language = document.getElementById('language').value;
+      const videoTitle = videoLinks[language].title;
       const duration = Math.round((new Date() - startTime) / 60000) + " minutes";
+
       const data = new FormData();
       data.append('name', name);
       data.append('truck', truck);
@@ -139,7 +149,7 @@
       });
 
       document.getElementById('completionSection').innerHTML = "<h3>✅ Course marked as completed!</h3>";
-    }
+    });
   </script>
 
 </body>
