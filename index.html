@@ -4,25 +4,27 @@
 <head>
   <title>Driver Check-In</title>
   <style>
-    body {
+    html, body {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      width: 100%;
       font-family: Arial, sans-serif;
-      text-align: center;
-      padding-top: 50px;
     }
-    form, #completionSection, #videoSection {
-      display: inline-block;
-      padding: 30px;
-      background-color: #f2f2f2;
-      border-radius: 10px;
-      box-shadow: 0 0 10px #ccc;
-      margin-top: 20px;
-      max-width: 600px;
+    #checkinForm, #completionSection, #videoSection {
+      display: none;
+      text-align: center;
+      padding: 20px;
+    }
+    #checkinForm.active, #completionSection.active, #videoSection.active {
+      display: block;
     }
     input, select, button {
       margin: 10px 0;
       padding: 10px;
-      width: 100%;
-      max-width: 300px;
+      width: 90%;
+      max-width: 400px;
+      font-size: 16px;
     }
     button {
       background-color: #4CAF50;
@@ -31,25 +33,34 @@
       font-weight: bold;
       cursor: pointer;
     }
-    #completionSection, #videoSection {
-      display: none;
+    #videoNote {
+      font-size: 18px;
+      font-weight: bold;
+      margin: 20px 0;
     }
     iframe {
-      width: 100%;
-      height: 100vh;
-      margin-top: 20px;
       border: none;
+      width: 100vw;
+      height: 100vh;
     }
-    #videoNote {
-      font-size: 16px;
-      font-weight: bold;
-      margin-bottom: 20px;
+    #videoContainer {
+      position: relative;
+    }
+    #completionSection {
+      position: fixed;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #ffffffee;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 0 10px #ccc;
     }
   </style>
 </head>
 <body>
 
-  <form id="checkinForm">
+  <form id="checkinForm" class="active">
     <h2>Driver Check-In</h2>
     <input type="text" id="name" placeholder="Full Name" required><br>
     <input type="text" id="truck" placeholder="Truck Number" required><br>
@@ -64,33 +75,34 @@
 
   <div id="videoSection">
     <div id="videoNote"></div>
-    <iframe id="videoFrame" src="" allowfullscreen></iframe>
+    <div id="videoContainer">
+      <iframe id="videoFrame" src="" allowfullscreen></iframe>
+    </div>
   </div>
 
   <div id="completionSection">
-    <h3>Click below to confirm you watched the course:</h3>
-    <button id="completeBtn">Mark as Completed</button>
+    <button id="completeBtn">✅ Mark as Completed</button>
   </div>
 
   <script>
     const videoLinks = {
       Swahili: {
-        url: "https://drive.google.com/file/d/11dizfdhwsutrjiVhZbkSqJEz7q0OwscD/preview",
+        url: "https://drive.google.com/file/d/11dizfdhwsutrjiVhZbkSqJEz7q0OwscD/view?usp=drive_link",
         title: "Kozi ya Usalama",
-        duration: 98, // 1 min 38 sec
-        note: "Tafadhali tazama video yote. Baada ya hapo utaweza kubonyeza kumaliza kozi."
+        duration: 98,
+        note: "Tafadhali tazama video yote. Baada ya sekunde 10 kabla ya video kuisha, kitufe cha kukamilisha kozi kitaonekana."
       },
       English: {
-        url: "https://drive.google.com/file/d/1xu_BSP2XHLTDGFmGQ5h_eB_kI0XRGlZB/preview",
+        url: "https://drive.google.com/file/d/1xu_BSP2XHLTDGFmGQ5h_eB_kI0XRGlZB/view?usp=drive_link",
         title: "HSSEQ Safety Course",
-        duration: 555, // 9 min 15 sec
-        note: "Please watch the whole video. After that, a popup will appear to mark the course as completed."
+        duration: 555,
+        note: "Please watch the full video. 10 seconds before it ends, the button to mark completion will appear."
       },
       Portuguese: {
-        url: "https://docs.google.com/presentation/d/e/2PACX-1vTjzXq7ULZZ6UeJ3EUM/preview",
+        url: "https://docs.google.com/presentation/d/1UCQxegTbqeaDNUK_9FA25s-1eCi2ySWYrjQTeqpL4Fo/edit?usp=drive_link",
         title: "Curso de Segurança",
-        duration: 88, // 1 min 28 sec
-        note: "Por favor, assista ao vídeo completo. Depois disso, um botão irá aparecer para concluir o curso."
+        duration: 88,
+        note: "Assista ao vídeo completo. Faltando 10 segundos, aparecerá o botão de conclusão."
       }
     };
 
@@ -110,6 +122,7 @@
 
       const video = videoLinks[language];
       const totalDurationMs = video.duration * 1000;
+      const buttonRevealTime = totalDurationMs - 10000;
       startTime = new Date();
 
       const formData = new FormData();
@@ -127,13 +140,14 @@
       const result = await response.json();
       rowId = result.row;
 
+      document.getElementById('checkinForm').classList.remove('active');
       document.getElementById('videoFrame').src = video.url;
       document.getElementById('videoNote').innerText = `(${video.title})\n${video.note}`;
-      document.getElementById('videoSection').style.display = 'block';
+      document.getElementById('videoSection').classList.add('active');
 
       setTimeout(() => {
-        document.getElementById('completionSection').style.display = 'block';
-      }, totalDurationMs);
+        document.getElementById('completionSection').classList.add('active');
+      }, buttonRevealTime);
     });
 
     document.getElementById('completeBtn').addEventListener('click', async () => {
