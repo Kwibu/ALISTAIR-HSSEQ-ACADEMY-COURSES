@@ -13,28 +13,22 @@
       background: url('trucks.jpg') no-repeat center center fixed;
       background-size: cover;
     }
-
     body::before {
       content: "";
       position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
       background: rgba(255, 255, 255, 0.85);
       z-index: -1;
     }
-
     .section {
       display: none;
       text-align: center;
       padding: 20px;
     }
-
     .active {
       display: block;
     }
-
     h2 {
       font-size: 28px;
       font-weight: bold;
@@ -43,10 +37,9 @@
       display: inline-block;
       padding: 16px 24px;
       border-radius: 10px;
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+      box-shadow: 0 2px 8px rgba(0,0,0,0.15);
       margin-bottom: 30px;
     }
-
     input, select, button {
       margin: 12px auto;
       padding: 12px;
@@ -55,36 +48,31 @@
       font-size: 16px;
       display: block;
     }
-
     button {
       background-color: #4CAF50;
       color: white;
       border: none;
       font-weight: bold;
       cursor: pointer;
-      font-size: 16px;
       border-radius: 6px;
-      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
     }
-
     #videoNote {
       background: #fff;
       padding: 16px;
       margin: 20px auto;
       border-radius: 10px;
       max-width: 600px;
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+      box-shadow: 0 2px 8px rgba(0,0,0,0.15);
       font-size: 18px;
       font-weight: bold;
       color: #222;
       white-space: pre-line;
     }
-
     video {
       width: 100%;
       max-height: 90vh;
     }
-
     #completionSection {
       position: fixed;
       bottom: 20px;
@@ -101,7 +89,7 @@
 <body>
 
   <div id="languageSection" class="section active">
-    <h2 id="languageHeading">Select Language / Chagua Lugha / Lenga Ilyashi / Selecione o Idioma</h2>
+    <h2>Select Language / Chagua Lugha / Lenga Ilyashi / Selecione o Idioma</h2>
     <select id="languageSelect" required>
       <option value="">-- Choose a Language --</option>
       <option value="Swahili">Swahili</option>
@@ -113,7 +101,8 @@
 
   <form id="checkinForm" class="section">
     <h2 id="formTitle">Driver Check-In</h2>
-    <input type="text" id="name" placeholder="Full Name" required>
+    <input type="text" id="name" list="driverNames" placeholder="Full Name" required>
+    <datalist id="driverNames"></datalist>
     <input type="text" id="truck" placeholder="Truck Number" required>
     <button type="submit" id="submitBtn">Submit and Watch Video</button>
   </form>
@@ -173,6 +162,31 @@
       }
     };
 
+    const driverList = [];
+
+    async function loadDriversFromSheet() {
+      const sheetUrl = "https://script.google.com/macros/s/AKfycbyMBrmHmYqkX-DIk8x0pwHO8poMj8wyW0I5_voNpDGKp8Jmg7ffLGOVhES3QpupTJCqqg/exec";
+      const response = await fetch(sheetUrl);
+      const data = await response.json();
+
+      const datalist = document.getElementById("driverNames");
+      data.forEach(driver => {
+        driverList.push(driver);
+        const option = document.createElement("option");
+        option.value = driver.name;
+        datalist.appendChild(option);
+      });
+    }
+
+    window.addEventListener("DOMContentLoaded", async () => {
+      await loadDriversFromSheet();
+    });
+
+    document.getElementById("name").addEventListener("input", function () {
+      const selected = driverList.find(driver => driver.name.toLowerCase() === this.value.toLowerCase());
+      document.getElementById("truck").value = selected ? selected.truck : "";
+    });
+
     let selectedLanguage = "";
     let startTime, rowId;
 
@@ -192,7 +206,7 @@
       document.getElementById("checkinForm").classList.add("active");
     }
 
-    document.getElementById("checkinForm").addEventListener("submit", async function(e) {
+    document.getElementById("checkinForm").addEventListener("submit", async function (e) {
       e.preventDefault();
       const name = document.getElementById("name").value.trim();
       const truck = document.getElementById("truck").value.trim();
