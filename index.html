@@ -1,14 +1,13 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+  <meta charset="UTF-8" />
   <title>Driver Check-In</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <style>
     html, body {
-      margin: 0;
-      padding: 0;
-      height: 100%;
-      width: 100%;
+      margin: 0; padding: 0;
+      height: 100%; width: 100%;
       font-family: Arial, sans-serif;
       background: url('trucks.jpg') no-repeat center center fixed;
       background-size: cover;
@@ -57,6 +56,10 @@
       border-radius: 6px;
       box-shadow: 0 2px 5px rgba(0,0,0,0.1);
     }
+    button:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
     #videoNote {
       background: #fff;
       padding: 16px;
@@ -101,14 +104,14 @@
 
   <form id="checkinForm" class="section">
     <h2 id="formTitle">Driver Check-In</h2>
-    <input type="text" id="name" list="driverNames" placeholder="Full Name" required>
+    <input type="text" id="name" list="driverNames" placeholder="Full Name" autocomplete="off" required />
     <datalist id="driverNames"></datalist>
-    <input type="text" id="truck" placeholder="Truck Number" required>
+    <input type="text" id="truck" placeholder="Truck Number" required />
     <button type="submit" id="submitBtn">Submit and Watch Video</button>
   </form>
 
   <div id="videoSection" class="section">
-    <div id="videoNote"></div>
+    <div id="videoNote">Loading video, please wait...</div>
     <video id="trainingVideo" controls autoplay></video>
   </div>
 
@@ -165,37 +168,36 @@
     const driverList = [];
 
     async function loadDriversFromSheet() {
-      const sheetUrl = "https://script.google.com/macros/s/AKfycbyMBrmHmYqkX-DIk8x0pwHO8poMj8wyW0I5_voNpDGKp8Jmg7ffLGOVhES3QpupTJCqqg/exec";
-      const response = await fetch(sheetUrl);
-      const data = await response.json();
-
-      const datalist = document.getElementById("driverNames");
-      data.forEach(driver => {
-        driverList.push(driver);
-        const option = document.createElement("option");
-        option.value = driver.name;
-        datalist.appendChild(option);
-      });
+      try {
+        const response = await fetch("https://script.google.com/macros/s/AKfycbyMBrmHmYqkX-DIk8x0pwHO8poMj8wyW0I5_voNpDGKp8Jmg7ffLGOVhES3QpupTJCqqg/exec");
+        const data = await response.json();
+        const datalist = document.getElementById("driverNames");
+        data.forEach(driver => {
+          driverList.push(driver);
+          const option = document.createElement("option");
+          option.value = driver.name;
+          datalist.appendChild(option);
+        });
+      } catch (err) {
+        alert("⚠️ Failed to load driver list.");
+      }
     }
 
-    window.addEventListener("DOMContentLoaded", async () => {
-      await loadDriversFromSheet();
-    });
+    window.addEventListener("DOMContentLoaded", loadDriversFromSheet);
 
     document.getElementById("name").addEventListener("input", function () {
-      const selected = driverList.find(driver => driver.name.toLowerCase() === this.value.toLowerCase());
+      const selected = driverList.find(driver => driver.name.trim().toLowerCase() === this.value.trim().toLowerCase());
       document.getElementById("truck").value = selected ? selected.truck : "";
     });
 
-    let selectedLanguage = "";
-    let startTime, rowId;
+    let selectedLanguage = "", startTime, rowId;
 
     function proceedToForm() {
       const lang = document.getElementById("languageSelect").value;
       if (!lang) return alert("Please select a language.");
       selectedLanguage = lang;
-
       const t = translations[lang];
+
       document.getElementById("formTitle").innerText = t.formTitle;
       document.getElementById("name").placeholder = t.namePlaceholder;
       document.getElementById("truck").placeholder = t.truckPlaceholder;
@@ -214,8 +216,11 @@
       const video = videoLinks[lang];
       const videoEl = document.getElementById("trainingVideo");
 
-      startTime = new Date();
+      // Disable submit button to avoid repeat clicks
+      const submitBtn = document.getElementById("submitBtn");
+      submitBtn.disabled = true;
 
+      startTime = new Date();
       const formData = new FormData();
       formData.append("name", name);
       formData.append("truck", truck);
