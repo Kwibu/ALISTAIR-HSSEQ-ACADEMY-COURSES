@@ -6,8 +6,10 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <style>
     html, body {
-      margin: 0; padding: 0;
-      height: 100%; width: 100%;
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      width: 100%;
       font-family: Arial, sans-serif;
       background: url('trucks.jpg') no-repeat center center fixed;
       background-size: cover;
@@ -15,8 +17,10 @@
     body::before {
       content: "";
       position: fixed;
-      top: 0; left: 0;
-      width: 100%; height: 100%;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
       background: rgba(255, 255, 255, 0.85);
       z-index: -1;
     }
@@ -49,12 +53,16 @@
     }
     button {
       background-color: #4CAF50;
-      color: white;
+      color: #fff;
       border: none;
       font-weight: bold;
       cursor: pointer;
       border-radius: 6px;
       box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+    .back-button, .close-button {
+      background-color: #f44336;
+      color: #fff;
     }
     button:disabled {
       opacity: 0.5;
@@ -91,6 +99,7 @@
 </head>
 <body>
 
+  <!-- Language selection -->
   <div id="languageSection" class="section active">
     <h2>Select Language / Chagua Lugha / Saleni Ululimi / Selecione o Idioma</h2>
     <select id="languageSelect" required>
@@ -99,182 +108,242 @@
       <option value="Bemba">Bemba</option>
       <option value="Portuguese">Portuguese</option>
     </select>
-    <button onclick="proceedToForm()">Continue</button>
+    <button type="button" id="continueBtn">Continue</button>
   </div>
 
+  <!-- Check-in form -->
   <form id="checkinForm" class="section">
     <h2 id="formTitle">Driver Check-In</h2>
     <input type="text" id="name" list="driverNames" placeholder="Full Name" autocomplete="off" required />
     <datalist id="driverNames"></datalist>
     <input type="text" id="truck" placeholder="Truck Number" required />
-    <button type="submit" id="submitBtn">Submit and Watch Video</button>
+    <button type="button" id="backBtn" class="back-button">Back</button>
+    <button type="submit" id="submitBtn">Submit &amp; Watch</button>
   </form>
 
+  <!-- Video section -->
   <div id="videoSection" class="section">
+    <button type="button" id="closeBtn" class="close-button">Cancel</button>
     <div id="videoNote">Loading video, please wait...</div>
-    <video id="trainingVideo" controls autoplay></video>
+    <video id="trainingVideo" controls></video>
   </div>
 
+  <!-- Completion -->
   <div id="completionSection">
-    <button id="completeBtn">✅ Mark as Completed</button>
+    <button id="completeBtn">Mark Complete</button>
   </div>
 
   <script>
+    // Translations for UI elements per language
     const translations = {
       Swahili: {
-        formTitle: "Kuingia kwa Dereva",
-        namePlaceholder: "Jina Kamili",
-        truckPlaceholder: "Namba ya Gari",
-        submitBtn: "Tuma na Tazama Video",
-        completeBtn: "✅ Nimekamilisha Kozi",
-        completeMsg: "✅ Kozi imekamilishwa kwa mafanikio!"
+        continue: 'Endelea',
+        back: '⬅️ Rudi',
+        cancel: '❌ Sitisha Video',
+        formTitle: 'Kuingia kwa Dereva',
+        name: 'Jina Kamili',
+        truck: 'Namba ya Gari',
+        submit: 'Tuma & Tazama',
+        complete: 'Nimekamilisha Kozi'
       },
       Bemba: {
-        formTitle: "Ifyebo fya Kwingililamor",
-        namePlaceholder: "Amashina",
-        truckPlaceholder: "Namba ya Motoka",
-        submitBtn: "Tumani no kutamba Vidio",
-        completeBtn: "✅ Nasheya Ukufwaya",
-        completeMsg: "✅ Ukufwaya wapwa bwino!"
+        continue: 'Tendekela',
+        back: '⬅️ Baya',
+        cancel: '❌ Fumya Video',
+        formTitle: 'Ifyebo fya Kwingilila',
+        name: 'Amashina',
+        truck: 'Namba ya Motoka',
+        submit: 'Tumani no kutamba Vidio',
+        complete: 'Nasheya Ukufwaya'
       },
       Portuguese: {
-        formTitle: "Registro do Motorista",
-        namePlaceholder: "Nome Completo",
-        truckPlaceholder: "Número do Caminhão",
-        submitBtn: "Enviar e Assistir ao Vídeo",
-        completeBtn: "✅ Marcar como Concluído",
-        completeMsg: "✅ Curso concluído com sucesso!"
+        continue: 'Continuar',
+        back: '⬅️ Voltar',
+        cancel: '❌ Cancelar Vídeo',
+        formTitle: 'Registro do Motorista',
+        name: 'Nome Completo',
+        truck: 'Número do Caminhão',
+        submit: 'Enviar e Assistir ao Vídeo',
+        complete: '✅ Curso concluído com sucesso!'
       }
     };
 
+    // Video source and notes per language
     const videoLinks = {
       Swahili: {
-        url: "https://raw.githubusercontent.com/Kwibu/API-3-Test/main/Safety%20Campaign%20for%20drivers%20(Swahili).mp4",
-        title: "Kampeni ya Usalama kwa Madereva",
-        note: "Tafadhali tazama video yote. Baada ya sekunde 10 kabla ya video kuisha, kitufe cha kukamilisha kozi kitaonekana."
+        url: 'https://raw.githubusercontent.com/Kwibu/API-3-Test/main/Safety%20Campaign%20for%20drivers%20(Swahili).mp4',
+        note: 'Tafadhali tazama video yote. Kitufe cha kukamilisha kitaonekana sekunde 10 kabla ya mwisho.'
       },
       Bemba: {
-        url: "https://raw.githubusercontent.com/Kwibu/API-3-Test/main/Safety%20Campaign%20for%20drivers%20(English).mp4",
-        title: "Driver Safety Campaign (Bemba)",
-        note: "Tufweniko filyo video yonse. Pali sekonde 10 ukupwa, akabuto ako ku mark uko kufwaya kwapwa kalatampako."
+        url: 'https://raw.githubusercontent.com/Kwibu/API-3-Test/main/Safety%20Campaign%20for%20drivers%20(English).mp4',
+        note: 'Tazama video yonse. Sekonde 10 pa kusala, batani liya kuoneka.'
       },
       Portuguese: {
-        url: "https://raw.githubusercontent.com/Kwibu/API-3-Test/main/Safety%20Campaign%20for%20drivers%20(Portugal).mp4",
-        title: "Campanha de Segurança para Motoristas",
-        note: "Assista ao vídeo completo. Faltando 10 segundos, aparecerá o botão de conclusão."
+        url: 'https://raw.githubusercontent.com/Kwibu/API-3-Test/main/Safety%20Campaign%20for%20drivers%20(Portugal).mp4',
+        note: 'Assista ao vídeo completo. O botão aparecerá 10 segundos antes do fim.'
       }
     };
 
+    // State variables
+    let selectedLang = '';
+    let startTime;
+    let rowId;
     const driverList = [];
 
+    // Load driver data from Google Sheets via JSONP
     function loadDriverJSONP() {
       const script = document.createElement('script');
-      script.src = "https://script.google.com/macros/s/AKfycbwnBphnolRoT_lMCuN3f8d1OQ9FJpSZspJ0QdZcPtMcy3uN8GtwxVUyXThGcDEJBbyAeQ/exec";
+      script.src = 'https://script.google.com/macros/s/AKfycbwnBphnolRoT_lMCuN3f8d1OQ9FJpSZspJ0QdZcPtMcy3uN8GtwxVUyXThGcDEJBbyAeQ/exec?callback=populateDrivers';
       document.body.appendChild(script);
     }
 
-    function populateDrivers(data) {
-      const datalist = document.getElementById("driverNames");
+    // JSONP callback to populate driverList and datalist
+    window.populateDrivers = function(data) {
+      const datalist = document.getElementById('driverNames');
       data.forEach(driver => {
         driverList.push(driver);
-        const option = document.createElement("option");
+        const option = document.createElement('option');
         option.value = driver.name;
         datalist.appendChild(option);
       });
-    }
+    };
 
-    window.addEventListener("DOMContentLoaded", loadDriverJSONP);
+    document.addEventListener('DOMContentLoaded', loadDriverJSONP);
 
-    document.getElementById("name").addEventListener("input", function () {
-      const selected = driverList.find(driver => driver.name.trim().toLowerCase() === this.value.trim().toLowerCase());
-      document.getElementById("truck").value = selected ? selected.truck : "";
+    // Element references
+    const languageSection = document.getElementById('languageSection');
+    const checkinForm = document.getElementById('checkinForm');
+    const videoSection = document.getElementById('videoSection');
+    const completionSection = document.getElementById('completionSection');
+
+    const languageSelect = document.getElementById('languageSelect');
+    const continueBtn = document.getElementById('continueBtn');
+    const backBtn = document.getElementById('backBtn');
+    const closeBtn = document.getElementById('closeBtn');
+    const formTitle = document.getElementById('formTitle');
+    const nameInput = document.getElementById('name');
+    const truckInput = document.getElementById('truck');
+    const submitBtn = document.getElementById('submitBtn');
+    const videoNote = document.getElementById('videoNote');
+    const trainingVideo = document.getElementById('trainingVideo');
+    const completeBtn = document.getElementById('completeBtn');
+
+    // Update Continue button text on language change
+    languageSelect.addEventListener('change', () => {
+      const t = translations[languageSelect.value];
+      continueBtn.innerText = t ? t.continue : 'Continue';
     });
 
-    let selectedLanguage = "", startTime, rowId;
-
-    function proceedToForm() {
-      const lang = document.getElementById("languageSelect").value;
-      if (!lang) return alert("Please select a language.");
-      selectedLanguage = lang;
+    // Proceed from language selection to form
+    continueBtn.addEventListener('click', () => {
+      const lang = languageSelect.value;
+      if (!lang) {
+        alert('Please select a language.');
+        return;
+      }
+      selectedLang = lang;
       const t = translations[lang];
 
-      document.getElementById("formTitle").innerText = t.formTitle;
-      document.getElementById("name").placeholder = t.namePlaceholder;
-      document.getElementById("truck").placeholder = t.truckPlaceholder;
-      document.getElementById("submitBtn").innerText = t.submitBtn;
-      document.getElementById("completeBtn").innerText = t.completeBtn;
+      // Update form UI with translations
+      formTitle.innerText = t.formTitle;
+      nameInput.placeholder = t.name;
+      truckInput.placeholder = t.truck;
+      submitBtn.innerText = t.submit;
+      completeBtn.innerText = t.complete;
+      backBtn.innerText = t.back;
+      closeBtn.innerText = t.cancel;
 
-      document.getElementById("languageSection").classList.remove("active");
-      document.getElementById("checkinForm").classList.add("active");
-    }
+      // Show form, hide language section
+      languageSection.classList.remove('active');
+      checkinForm.classList.add('active');
+    });
 
-    document.getElementById("checkinForm").addEventListener("submit", async function (e) {
+    // Go back to language selection
+    backBtn.addEventListener('click', () => {
+      checkinForm.reset();
+      languageSelect.value = '';
+      continueBtn.innerText = 'Continue';
+
+      checkinForm.classList.remove('active');
+      languageSection.classList.add('active');
+    });
+
+    // Cancel video and return to form
+    closeBtn.addEventListener('click', () => {
+      trainingVideo.pause();
+      trainingVideo.src = '';
+      videoSection.classList.remove('active');
+      completionSection.style.display = 'none';
+      checkinForm.classList.add('active');
+    });
+
+    // Autofill truck number based on driver name
+    nameInput.addEventListener('input', () => {
+      const driver = driverList.find(d => d.name.toLowerCase() === nameInput.value.toLowerCase());
+      truckInput.value = driver ? driver.truck : '';
+    });
+
+    // Handle form submission and show video
+    checkinForm.addEventListener('submit', async (e) => {
       e.preventDefault();
-      const name = document.getElementById("name").value.trim();
-      const truck = document.getElementById("truck").value.trim();
-      const lang = selectedLanguage;
-      const video = videoLinks[lang];
-      const videoEl = document.getElementById("trainingVideo");
-
-      // Disable submit button
-      const submitBtn = document.getElementById("submitBtn");
       submitBtn.disabled = true;
-
       startTime = new Date();
+
+      // Record course start
       const formData = new FormData();
-      formData.append("name", name);
-      formData.append("truck", truck);
-      formData.append("language", lang);
-      formData.append("videoTitle", video.title);
-      formData.append("status", "Course Started");
+      formData.append('name', nameInput.value);
+      formData.append('truck', truckInput.value);
+      formData.append('language', selectedLang);
+      formData.append('videoTitle', videoLinks[selectedLang].url);
+      formData.append('status', 'Course Started');
 
-      const response = await fetch("https://script.google.com/macros/s/AKfycbzUy3d6QTbXcjh-kq0O8OsnKQGrMsQlE9CXSzfwiVbc19avtjsCPP3wA9hjd-CikNZJ/exec", {
-        method: "POST",
-        body: formData,
-      });
-
+      const response = await fetch(
+        'https://script.google.com/macros/s/AKfycbzUy3d6QTbXcjh-kq0O8OsnKQGrMsQlE9CXSzfwiVbc19avtjsCPP3wA9hjd-CikNZJ/exec',
+        { method: 'POST', body: formData }
+      );
       const result = await response.json();
       rowId = result.row;
 
-      document.getElementById("videoNote").innerText = `(${video.title})\n${video.note}`;
-      document.getElementById("checkinForm").classList.remove("active");
-      document.getElementById("videoSection").classList.add("active");
+      // Display video and note
+      videoNote.innerText = videoLinks[selectedLang].note;
+      checkinForm.classList.remove('active');
+      videoSection.classList.add('active');
 
-      videoEl.src = video.url;
-      videoEl.addEventListener("timeupdate", () => {
-        if (videoEl.duration - videoEl.currentTime <= 10) {
-          document.getElementById("completionSection").style.display = "block";
+      trainingVideo.src = videoLinks[selectedLang].url;
+      trainingVideo.load();
+      trainingVideo.play();
+
+      // Show completion button 10s before end
+      trainingVideo.addEventListener('timeupdate', () => {
+        if (trainingVideo.duration - trainingVideo.currentTime <= 10) {
+          completionSection.style.display = 'block';
         }
       });
     });
 
-    document.getElementById("completeBtn").addEventListener("click", async () => {
-      const name = document.getElementById("name").value.trim();
-      const truck = document.getElementById("truck").value.trim();
-      const lang = selectedLanguage;
-      const videoTitle = videoLinks[lang].title;
-      const duration = Math.round((new Date() - startTime) / 60000) + " minutes";
+    // Mark course completed
+    completeBtn.addEventListener('click', async () => {
+      const durationMinutes = Math.round((new Date() - startTime) / 60000);
+      const formData = new FormData();
+      formData.append('name', nameInput.value);
+      formData.append('truck', truckInput.value);
+      formData.append('videoTitle', videoLinks[selectedLang].url);
+      formData.append('status', 'Completed');
+      formData.append('duration', `${durationMinutes} minutes`);
+      formData.append('rowId', rowId);
 
-      const data = new FormData();
-      data.append("name", name);
-      data.append("truck", truck);
-      data.append("videoTitle", videoTitle);
-      data.append("status", "Completed");
-      data.append("duration", duration);
-      data.append("rowId", rowId);
-
-      const response = await fetch("https://script.google.com/macros/s/AKfycbzUy3d6QTbXcjh-kq0O8OsnKQGrMsQlE9CXSzfwiVbc19avtjsCPP3wA9hjd-CikNZJ/exec", {
-        method: "POST",
-        body: data,
-      });
-
+      const response = await fetch(
+        'https://script.google.com/macros/s/AKfycbzUy3d6QTbXcjh-kq0O8OsnKQGrMsQlE9CXSzfwiVbc19avtjsCPP3wA9hjd-CikNZJ/exec',
+        { method: 'POST', body: formData }
+      );
       const result = await response.json();
       if (result.success) {
-        document.getElementById("completionSection").innerHTML = `<h3>${translations[lang].completeMsg}</h3>`;
+        completionSection.innerHTML = `<h3>${translations[selectedLang].complete}</h3>`;
       } else {
-        alert("⚠️ Failed to mark as complete: " + result.message);
+        alert('⚠️ Failed to mark as complete: ' + result.message);
       }
     });
   </script>
+
 </body>
 </html>
