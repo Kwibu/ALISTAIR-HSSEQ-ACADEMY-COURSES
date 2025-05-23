@@ -18,7 +18,7 @@ This web app is a multilingual driver check-in and training tool. It allows driv
 - Form fields for Name and Truck Number
 - Embedded HTML5 training video in selected language
 - Localized “Mark as Completed” and completion confirmation message
-- Completion button appears 10 seconds before video ends
+- Completion button appears at the end
 - Google Sheets integration for:
   - Course Start Time
   - Completion Time
