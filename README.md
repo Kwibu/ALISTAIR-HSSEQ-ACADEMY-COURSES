@@ -1,89 +1,118 @@
-# 🚛 Driver Safety Check-In App
+# Driver Check-In Web App
 
-This web app is a multilingual driver check-in and training tool. It allows drivers to register, watch a safety video in their language, and confirm completion — with all data automatically logged to a Google Sheet. Monthly and yearly reports can also be generated directly from the sheet.
+A multi-language driver check-in portal that:
 
----
-
-## 🌐 Supported Languages
-
-- 🇹🇿 Swahili
-- 🇿🇲 Bemba
-- 🇲🇿 Portuguese
+- Lets drivers select English, Swahili, Bemba or Portuguese  
+- Autocompletes driver names (with truck numbers) from a Google Sheet  
+- Records **Course Started** and **Course Completed** events back to Google Sheets  
+- Plays an MP4 or embedded YouTube video and reveals the **Mark Complete** button 10 s before the end  
 
 ---
 
-## 🎯 Features
+## 🚀 Features
 
-- Language selector (localized labels, buttons, and messages)
-- Form fields for Name and Truck Number
-- Embedded HTML5 training video in selected language
-- Localized “Mark as Completed” and completion confirmation message
-- Completion button appears at the end
-- Google Sheets integration for:
-  - Course Start Time
-  - Completion Time
-  - Duration Tracking
-- Built-in Monthly and Yearly Reports (via Google Apps Script menu)
-
----
-
-## 📁 Files
-
-- `index.html` – Main app interface
-- `trucks.jpg` – Background image
-- `README.md` – Project documentation
+1. **Language Selection**  
+   Localized UI for English, Swahili, Bemba and Portuguese.  
+2. **Driver Autocomplete**  
+   Pulls `{ name, truck }` from your Google Sheet via Apps-Script and fills a `<datalist>`.  
+3. **Logging**  
+   Records start & completion events (with timestamps and duration) back to your logging Apps-Script.  
+4. **Video Playback**  
+   - **English**: YouTube embed via IFrame API (polls remaining time).  
+   - **Other languages**: Native HTML5 `<video>`.  
+5. **Smart “Mark Complete”**  
+   Button only appears 10 s before the video ends.  
 
 ---
 
-## 📊 Google Sheets Integration
+## 📝 Prerequisites
 
-All data is submitted to this Google Apps Script endpoint: https://script.google.com/macros/s/AKfycbzUy3d6QTbXcjh-kq0O8OsnKQGrMsQlE9CXSzfwiVbc19avtjsCPP3wA9hjd-CikNZJ/exec
-
-### Tracked Fields:
-
-| Name | Truck | Language | Video Title | Course Started | Course Completed | Duration |
-|------|-------|----------|-------------|----------------|------------------|----------|
-
----
-
-## 📈 Reports
-
-The Google Sheet contains a custom menu **“Driver Reports”** with the following options:
-
-- ✅ Generate Monthly Report
-- ✅ Generate Yearly Report
-
-Each option creates a new sheet summarizing completions by month or year.
+- A **Google Sheet** (e.g. “Sheet1”) with columns:
+Full Name | Truck ID
+Manyanda Maziku | T1234 ABC
+Jordan Chaki | T5678 DEF
+…
+- Two **Apps Script** web-apps published as “Anyone, even anonymous”:
+1. **Driver list endpoint** (returns JSON array of `{name,truck}`)  
+   e.g. `https://script.google.com/macros/s/…/exec`
+2. **Logging endpoint** (accepts POST of `name,truck,language,videoTitle,status[,duration,rowId]`)  
+   e.g. `https://script.google.com/macros/s/…/exec`
+- A static web-server (GitHub Pages, Firebase Hosting, etc.) to serve the HTML.
 
 ---
 
-## 🚀 Deployment Instructions
+## 🛠️ Setup
 
-1. Clone or download the repository
-2. Ensure `trucks.jpg` is in the root folder
-3. Host the files on any static site platform (e.g., GitHub Pages, Netlify)
-4. Ensure video files are hosted publicly (GitHub-hosted `.mp4` links are used)
-5. Link the `index.html` to your deployed Google Apps Script
+### 1. Driver-List Apps Script
 
----
+Replace your existing `doGet()` with:
 
-## 🛠 Customization
+```js
+function doGet() {
+const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Sheet1");
+const rows  = sheet.getDataRange().getValues().slice(1);
+const out   = rows
+  .filter(r => r[0] && r[1])
+  .map(r => ({ name: r[0], truck: r[1] }));
+  
+return ContentService
+  .createTextOutput(JSON.stringify(out))
+  .setMimeType(ContentService.MimeType.JSON);
+}
+Deploy → New deployment → Web app → “Execute as: Me” + “Who has access: Anyone, even anonymous.”
+Copy the Web app URL for the driver list.
 
-To update:
-- **Languages**: Edit `translations` and `videoLinks` in the JavaScript section of `index.html`
-- **Completion message**: Translations for “Course Completed” can be edited per language
-- **Reports**: You can extend the reporting script to filter by truck, language, or duration
+2. Logging Apps Script
+Example doPost():
+function doPost(e) {
+  const ss    = SpreadsheetApp.openById("YOUR_SHEET_ID");
+  const sheet = ss.getSheetByName("Log");
+  const p     = e.parameter;
+  sheet.appendRow([
+    p.name, p.truck, p.language, p.videoTitle,
+    p.status, new Date(), p.duration || ""
+  ]);
+  return ContentService
+    .createTextOutput(JSON.stringify({ success: true, row: sheet.getLastRow() }))
+    .setMimeType(ContentService.MimeType.JSON);
+}
+Deploy similarly and copy the Web app URL for logging.
 
----
+3. Update index.html
+In your <script>:
+const DRIVER_LIST_URL = 'https://script.google.com/macros/s/.../exec';
+const LOGGING_URL     = 'https://script.google.com/macros/s/.../exec';
+Verify your YouTube video ID and MP4 URLs in the videoLinks map.
+📂 Project Structure
+/
+├─ index.html        ← Full HTML + JS UI
+├─ README.md         ← This file
+└─ apps-script/      ← Google-Apps-Script projects
+   ├─ driverList.gs
+   └─ logging.gs
+⚙️ Usage
+Open index.html in a browser.
 
-## 👤 Author
+Select a language and Continue.
 
-Created by: **Kwilasa Augustine Kwilasa**  
-📧 Email: [Kwilasaagustine57@gmail.com](mailto:Kwilasaagustine57@gmail.com)  
+Type your name – suggestions appear from the Sheet.
+
+Pick a name → Truck auto-fills.
+
+Submit & Watch → logs Course Started + plays video.
+
+Mark Complete appears 10 s before the end; click to log completion.
+✏️ Customization
+Add languages: extend the translations and videoLinks objects.
+
+Adjust timing: change the ≤10 checks in the JS.
+
+Style tweaks: edit CSS in the <style> block or load your own stylesheet.
+
+👤 Author
+Created by: Kwilasa Augustine Kwilasa
+📧 Email: Kwilasaagustine57@gmail.com
 🔧 Built with: Google Apps Script + HTML5 + GitHub Pages
 
----
-
-## 📜 License
-
+📜 License
 Free to use internally. For commercial use or redistribution, please request permission.
