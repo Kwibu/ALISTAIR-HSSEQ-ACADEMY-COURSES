@@ -22,8 +22,14 @@
       background: rgba(255,255,255,0.85);
       z-index: -1;
     }
-    .section { display: none; text-align: center; padding: 20px; }
-    .active  { display: block; }
+    .section {
+      display: none;
+      text-align: center;
+      padding: 20px;
+    }
+    .active {
+      display: block;
+    }
     h2 {
       font-size: 28px; font-weight: bold; color: #222;
       background: #fff; display: inline-block;
@@ -45,7 +51,9 @@
     .back-button, .close-button {
       background-color: #f44336; color: #fff;
     }
-    button:disabled { opacity: 0.5; cursor: not-allowed; }
+    button:disabled {
+      opacity: 0.5; cursor: not-allowed;
+    }
     #videoNote {
       background: #fff; padding: 16px;
       margin: 20px auto; border-radius: 10px;
@@ -58,8 +66,7 @@
     }
     #videoContainer iframe,
     #videoContainer video {
-      width: 100%; height: auto;
-      max-height: 90vh;
+      width: 100%; height: auto; max-height: 90vh;
     }
     #completionSection {
       position: fixed; bottom: 20px; left: 50%;
@@ -69,7 +76,7 @@
       display: none;
     }
   </style>
-  <!-- Load YouTube IFrame API for English video -->
+  <!-- YouTube IFrame API for English embed -->
   <script src="https://www.youtube.com/iframe_api"></script>
 </head>
 <body>
@@ -158,12 +165,12 @@
       }
     };
 
-    // Video URLs, notes & titles
+    // Video sources & metadata
     const videoLinks = {
       English: {
-        videoId:  'fVl88Q5DJ2w',
-        note:     'Please watch the full 1 minute 52 second video. The completion button will appear 10 seconds before the end.',
-        title:    'Driver Tiredness, Fatigue and Road Safety'
+        videoId: 'fVl88Q5DJ2w',
+        note:    'Please watch the full 1 minute 52 second video. The completion button will appear 10 seconds before the end.',
+        title:   'Driver Tiredness, Fatigue and Road Safety'
       },
       Swahili: {
         url:   'https://raw.githubusercontent.com/Kwibu/API-3-Test/main/Safety%20Campaign%20for%20drivers%20(Swahili).mp4',
@@ -186,131 +193,140 @@
     let startTime, rowId, ytPlayer, ytPoll;
     const driverList = [];
 
-    // Load drivers from Google Sheets via JSONP
-    function loadDriverJSONP() {
-      const s = document.createElement('script');
-      s.src = 'https://script.google.com/macros/s/AKfycbwnBphnolRoT_lMCuN3f8d1OQ9FJpSZspJ0QdZcPtMcy3uN8GtwxVUyXThGcDEJBbyAeQ/exec?callback=populateDrivers';
-      document.body.appendChild(s);
-    }
-    window.populateDrivers = data => {
-      const dl = document.getElementById('driverNames');
+    // Fetch driver list from your Apps Script
+    async function loadDrivers() {
+      const res = await fetch(
+        'https://script.google.com/macros/s/AKfycbyUqJCIYWHwTZeAeOCkUDAt3kHvEgoAZj4X8kOJtqu9gL24gUBSQHwzlQ6jqfpeHxJQOA/exec'
+      );
+      if (!res.ok) {
+        console.error('Failed to load drivers:', res.status, res.statusText);
+        return;
+      }
+      const data = await res.json();  // [{ name, truck }, …]
+      const dl   = document.getElementById('driverNames');
       data.forEach(d => {
         driverList.push(d);
         const opt = document.createElement('option');
         opt.value = d.name;
         dl.appendChild(opt);
       });
-    };
-    document.addEventListener('DOMContentLoaded', loadDriverJSONP);
+    }
+    document.addEventListener('DOMContentLoaded', loadDrivers);
 
-    // Element refs
-    const langSec   = document.getElementById('languageSection');
-    const form      = document.getElementById('checkinForm');
-    const videoSec  = document.getElementById('videoSection');
-    const complete  = document.getElementById('completionSection');
-    const sel       = document.getElementById('languageSelect');
-    const btnCont   = document.getElementById('continueBtn');
-    const btnBack   = document.getElementById('backBtn');
-    const btnClose  = document.getElementById('closeBtn');
-    const titleEl   = document.getElementById('formTitle');
-    const nameIn    = document.getElementById('name');
-    const truckIn   = document.getElementById('truck');
-    const btnSub    = document.getElementById('submitBtn');
-    const noteEl    = document.getElementById('videoNote');
-    const vidCont   = document.getElementById('videoContainer');
-    const btnDone   = document.getElementById('completeBtn');
+    // Element references
+    const langSection    = document.getElementById('languageSection');
+    const checkinForm    = document.getElementById('checkinForm');
+    const videoSection   = document.getElementById('videoSection');
+    const completionSection = document.getElementById('completionSection');
+    const languageSelect = document.getElementById('languageSelect');
+    const continueBtn    = document.getElementById('continueBtn');
+    const backBtn        = document.getElementById('backBtn');
+    const closeBtn       = document.getElementById('closeBtn');
+    const formTitle      = document.getElementById('formTitle');
+    const nameInput      = document.getElementById('name');
+    const truckInput     = document.getElementById('truck');
+    const submitBtn      = document.getElementById('submitBtn');
+    const videoNote      = document.getElementById('videoNote');
+    const videoContainer = document.getElementById('videoContainer');
+    const completeBtn    = document.getElementById('completeBtn');
 
-    // Update “Continue” text on selection
-    sel.addEventListener('change', () => {
-      const t = translations[sel.value] || translations.English;
-      btnCont.innerText = t.continue;
+    // Update “Continue” text when language changes
+    languageSelect.addEventListener('change', () => {
+      const t = translations[languageSelect.value] || translations.English;
+      continueBtn.innerText = t.continue;
     });
 
-    // “Continue” → form
-    btnCont.addEventListener('click', () => {
-      if (!sel.value) return alert('Please select a language.');
-      selectedLang = sel.value;
+    // Go to form
+    continueBtn.addEventListener('click', () => {
+      if (!languageSelect.value) {
+        alert('Please select a language.');
+        return;
+      }
+      selectedLang = languageSelect.value;
       const t = translations[selectedLang];
-      document.title     = t.pageTitle;
-      titleEl.innerText  = t.formTitle;
-      nameIn.placeholder = t.name;
-      truckIn.placeholder= t.truck;
-      btnSub.innerText   = t.submit;
-      btnDone.innerText  = t.complete;
-      btnBack.innerText  = t.back;
-      btnClose.innerText = t.cancel;
-      langSec.classList.remove('active');
-      form.classList.add('active');
+      document.title         = t.pageTitle;
+      formTitle.innerText    = t.formTitle;
+      nameInput.placeholder  = t.name;
+      truckInput.placeholder = t.truck;
+      submitBtn.innerText    = t.submit;
+      completeBtn.innerText  = t.complete;
+      backBtn.innerText      = t.back;
+      closeBtn.innerText     = t.cancel;
+
+      langSection.classList.remove('active');
+      checkinForm.classList.add('active');
     });
 
-    // Back → language selector
-    btnBack.addEventListener('click', () => {
-      form.reset();
-      sel.value = '';
-      btnCont.innerText = translations.English.continue;
-      document.title    = 'Driver Check-In';
-      form.classList.remove('active');
-      langSec.classList.add('active');
+    // Back to language select
+    backBtn.addEventListener('click', () => {
+      checkinForm.reset();
+      languageSelect.value = '';
+      continueBtn.innerText = translations.English.continue;
+      document.title       = 'Driver Check-In';
+
+      checkinForm.classList.remove('active');
+      langSection.classList.add('active');
     });
 
     // Cancel video
-    btnClose.addEventListener('click', () => {
+    closeBtn.addEventListener('click', () => {
       if (ytPlayer) {
         clearInterval(ytPoll);
         ytPlayer.destroy();
         ytPlayer = null;
       }
-      vidCont.innerHTML = '';
-      videoSec.classList.remove('active');
-      complete.style.display = 'none';
-      form.classList.add('active');
+      videoContainer.innerHTML = '';
+      videoSection.classList.remove('active');
+      completionSection.style.display = 'none';
+      checkinForm.classList.add('active');
     });
 
-    // Autofill truck
-    nameIn.addEventListener('input', () => {
-      const d = driverList.find(x => x.name.toLowerCase() === nameIn.value.toLowerCase());
-      truckIn.value = d ? d.truck : '';
+    // Autofill truck from datalist
+    nameInput.addEventListener('input', () => {
+      const match = driverList.find(d =>
+        d.name.toLowerCase() === nameInput.value.toLowerCase()
+      );
+      truckInput.value = match ? match.truck : '';
     });
 
-    // Submit & show video
-    form.addEventListener('submit', async e => {
+    // Submit & play video
+    checkinForm.addEventListener('submit', async e => {
       e.preventDefault();
-      btnSub.disabled = true;
+      submitBtn.disabled = true;
       startTime = new Date();
 
-      // Log course start
+      // Record course start
       const fd = new FormData();
-      fd.append('name', nameIn.value);
-      fd.append('truck', truckIn.value);
-      fd.append('language', selectedLang);
+      fd.append('name',       nameInput.value);
+      fd.append('truck',      truckInput.value);
+      fd.append('language',   selectedLang);
       fd.append('videoTitle', videoLinks[selectedLang].title);
-      fd.append('status', 'Course Started');
-      const res = await fetch(
+      fd.append('status',     'Course Started');
+      const resp = await fetch(
         'https://script.google.com/macros/s/AKfycbzUy3d6QTbXcjh-kq0O8OsnKQGrMsQlE9CXSzfwiVbc19avtjsCPP3wA9hjd-CikNZJ/exec',
         { method: 'POST', body: fd }
       );
-      rowId = (await res.json()).row;
+      rowId = (await resp.json()).row;
 
-      noteEl.innerText = videoLinks[selectedLang].note;
-      form.classList.remove('active');
-      videoSec.classList.add('active');
+      videoNote.innerText = videoLinks[selectedLang].note;
+      checkinForm.classList.remove('active');
+      videoSection.classList.add('active');
 
-      // English: use YouTube IFrame API
+      // English: YouTube embed
       if (selectedLang === 'English') {
-        vidCont.innerHTML = '<div id="ytPlayer"></div>';
+        videoContainer.innerHTML = '<div id="ytPlayer"></div>';
         ytPlayer = new YT.Player('ytPlayer', {
           videoId: videoLinks.English.videoId,
-          width: '100%',
-          height: '390',
+          width:   '100%',
+          height:  '390',
           events: {
             onReady: event => {
               event.target.playVideo();
-              // Poll every second for time remaining
               ytPoll = setInterval(() => {
                 const remaining = ytPlayer.getDuration() - ytPlayer.getCurrentTime();
                 if (remaining <= 10) {
                   clearInterval(ytPoll);
-                  complete.style.display = 'block';
+                  completionSection.style.display = 'block';
                 }
               }, 1000);
             }
@@ -318,38 +334,41 @@
         });
       } else {
         // Other languages: native <video>
-        vidCont.innerHTML = `<video id="trainingVideo" controls src="${videoLinks[selectedLang].url}"></video>`;
+        videoContainer.innerHTML =
+          `<video id="trainingVideo" controls src="${videoLinks[selectedLang].url}"></video>`;
         const tv = document.getElementById('trainingVideo');
         tv.play();
         tv.addEventListener('timeupdate', () => {
           if (tv.duration - tv.currentTime <= 10) {
-            complete.style.display = 'block';
+            completionSection.style.display = 'block';
           }
         });
       }
     });
 
-    // Mark course completed
-    btnDone.addEventListener('click', async () => {
+    // Mark complete
+    completeBtn.addEventListener('click', async () => {
       const duration = Math.round((new Date() - startTime) / 60000) + ' minutes';
-      const fd = new FormData();
-      fd.append('name', nameIn.value);
-      fd.append('truck', truckIn.value);
-      fd.append('videoTitle', videoLinks[selectedLang].title);
-      fd.append('status', 'Completed');
-      fd.append('duration', duration);
-      fd.append('rowId', rowId);
-      const res = await fetch(
+      const fd2 = new FormData();
+      fd2.append('name',       nameInput.value);
+      fd2.append('truck',      truckInput.value);
+      fd2.append('videoTitle', videoLinks[selectedLang].title);
+      fd2.append('status',     'Completed');
+      fd2.append('duration',   duration);
+      fd2.append('rowId',      rowId);
+
+      const resp2 = await fetch(
         'https://script.google.com/macros/s/AKfycbzUy3d6QTbXcjh-kq0O8OsnKQGrMsQlE9CXSzfwiVbc19avtjsCPP3wA9hjd-CikNZJ/exec',
-        { method: 'POST', body: fd }
+        { method: 'POST', body: fd2 }
       );
-      const json = await res.json();
-      if (json.success) {
-        complete.innerHTML = `<h3>${translations[selectedLang].complete}</h3>`;
+      const result = await resp2.json();
+      if (result.success) {
+        completionSection.innerHTML = `<h3>${translations[selectedLang].complete}</h3>`;
       } else {
-        alert('⚠️ Failed to mark as complete: ' + json.message);
+        alert('⚠️ Failed to mark as complete: ' + result.message);
       }
     });
   </script>
+
 </body>
 </html>
