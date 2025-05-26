@@ -78,19 +78,21 @@ function doPost(e) {
 }
 Deploy similarly and copy the Web app URL for logging.
 
-3. Update index.html
+### 3. Update index.html
 In your <script>:
 const DRIVER_LIST_URL = 'https://script.google.com/macros/s/.../exec';
 const LOGGING_URL     = 'https://script.google.com/macros/s/.../exec';
 Verify your YouTube video ID and MP4 URLs in the videoLinks map.
-📂 Project Structure
+
+### 📂 Project Structure
 /
 ├─ index.html        ← Full HTML + JS UI
 ├─ README.md         ← This file
 └─ apps-script/      ← Google-Apps-Script projects
    ├─ driverList.gs
    └─ logging.gs
-⚙️ Usage
+
+### ⚙️ Usage
 Open index.html in a browser.
 
 Select a language and Continue.
@@ -102,17 +104,18 @@ Pick a name → Truck auto-fills.
 Submit & Watch → logs Course Started + plays video.
 
 Mark Complete appears 10 s before the end; click to log completion.
-✏️ Customization
+
+### ✏️ Customization
 Add languages: extend the translations and videoLinks objects.
 
 Adjust timing: change the ≤10 checks in the JS.
 
 Style tweaks: edit CSS in the <style> block or load your own stylesheet.
 
-👤 Author
+### 👤 Author
 Created by: Kwilasa Augustine Kwilasa
 📧 Email: Kwilasaagustine57@gmail.com
 🔧 Built with: Google Apps Script + HTML5 + GitHub Pages
 
-📜 License
+### 📜 License
 Free to use internally. For commercial use or redistribution, please request permission.
