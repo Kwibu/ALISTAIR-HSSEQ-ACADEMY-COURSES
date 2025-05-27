@@ -76,7 +76,6 @@
       display: none;
     }
   </style>
-  <!-- YouTube IFrame API for English embed -->
   <script src="https://www.youtube.com/iframe_api"></script>
 </head>
 <body>
@@ -195,180 +194,220 @@
 
     // Fetch driver list from your Apps Script
     async function loadDrivers() {
-      const res = await fetch(
-        'https://script.google.com/macros/s/AKfycbyUqJCIYWHwTZeAeOCkUDAt3kHvEgoAZj4X8kOJtqu9gL24gUBSQHwzlQ6jqfpeHxJQOA/exec'
-      );
-      if (!res.ok) {
-        console.error('Failed to load drivers:', res.status, res.statusText);
-        return;
+      try {
+        const res = await fetch(
+          'https://script.google.com/macros/s/AKfycbyUqJCIYWHwTZeAeOCkUDAt3kHvEgoAZj4X8kOJtqu9gL24gUBSQHwzlQ6jqfpeHxJQOA/exec'
+        );
+        if (!res.ok) {
+          console.error('Failed to load drivers:', res.status, res.statusText);
+          return;
+        }
+        const data = await res.json();  // [{ name, truck }, …]
+        const dl   = document.getElementById('driverNames');
+        data.forEach(d => {
+          driverList.push(d);
+          const opt = document.createElement('option');
+          opt.value = d.name;
+          dl.appendChild(opt);
+        });
+      } catch (e) {
+        console.error('Driver loading error:', e);
       }
-      const data = await res.json();  // [{ name, truck }, …]
-      const dl   = document.getElementById('driverNames');
-      data.forEach(d => {
-        driverList.push(d);
-        const opt = document.createElement('option');
-        opt.value = d.name;
-        dl.appendChild(opt);
-      });
     }
-    document.addEventListener('DOMContentLoaded', loadDrivers);
+    // ----
+    // Main code runs AFTER DOM loaded
+    document.addEventListener('DOMContentLoaded', function() {
 
-    // Element references
-    const langSection    = document.getElementById('languageSection');
-    const checkinForm    = document.getElementById('checkinForm');
-    const videoSection   = document.getElementById('videoSection');
-    const completionSection = document.getElementById('completionSection');
-    const languageSelect = document.getElementById('languageSelect');
-    const continueBtn    = document.getElementById('continueBtn');
-    const backBtn        = document.getElementById('backBtn');
-    const closeBtn       = document.getElementById('closeBtn');
-    const formTitle      = document.getElementById('formTitle');
-    const nameInput      = document.getElementById('name');
-    const truckInput     = document.getElementById('truck');
-    const submitBtn      = document.getElementById('submitBtn');
-    const videoNote      = document.getElementById('videoNote');
-    const videoContainer = document.getElementById('videoContainer');
-    const completeBtn    = document.getElementById('completeBtn');
+      loadDrivers();
 
-    // Update “Continue” text when language changes
-    languageSelect.addEventListener('change', () => {
-      const t = translations[languageSelect.value] || translations.English;
-      continueBtn.innerText = t.continue;
-    });
+      // Element references
+      const langSection    = document.getElementById('languageSection');
+      const checkinForm    = document.getElementById('checkinForm');
+      const videoSection   = document.getElementById('videoSection');
+      const completionSection = document.getElementById('completionSection');
+      const languageSelect = document.getElementById('languageSelect');
+      const continueBtn    = document.getElementById('continueBtn');
+      const backBtn        = document.getElementById('backBtn');
+      const closeBtn       = document.getElementById('closeBtn');
+      const formTitle      = document.getElementById('formTitle');
+      const nameInput      = document.getElementById('name');
+      const truckInput     = document.getElementById('truck');
+      const submitBtn      = document.getElementById('submitBtn');
+      const videoNote      = document.getElementById('videoNote');
+      const videoContainer = document.getElementById('videoContainer');
+      const completeBtn    = document.getElementById('completeBtn');
 
-    // Go to form
-    continueBtn.addEventListener('click', () => {
-      if (!languageSelect.value) {
-        alert('Please select a language.');
-        return;
+      // Translation function for all relevant UI
+      function applyTranslations(lang) {
+        const t = translations[lang] || translations.English;
+        document.title         = t.pageTitle;
+        formTitle.innerText    = t.formTitle;
+        nameInput.placeholder  = t.name;
+        truckInput.placeholder = t.truck;
+        submitBtn.innerText    = t.submit;
+        completeBtn.innerText  = t.complete;
+        backBtn.innerText      = t.back;
+        closeBtn.innerText     = t.cancel;
+        continueBtn.innerText  = t.continue;
       }
-      selectedLang = languageSelect.value;
-      const t = translations[selectedLang];
-      document.title         = t.pageTitle;
-      formTitle.innerText    = t.formTitle;
-      nameInput.placeholder  = t.name;
-      truckInput.placeholder = t.truck;
-      submitBtn.innerText    = t.submit;
-      completeBtn.innerText  = t.complete;
-      backBtn.innerText      = t.back;
-      closeBtn.innerText     = t.cancel;
 
-      langSection.classList.remove('active');
-      checkinForm.classList.add('active');
-    });
+      // On language selection change: update the continue button, etc
+      languageSelect.addEventListener('change', () => {
+        applyTranslations(languageSelect.value || 'English');
+      });
 
-    // Back to language select
-    backBtn.addEventListener('click', () => {
-      checkinForm.reset();
-      languageSelect.value = '';
-      continueBtn.innerText = translations.English.continue;
-      document.title       = 'Driver Check-In';
+      // Go to form
+      continueBtn.addEventListener('click', () => {
+        if (!languageSelect.value) {
+          alert('Please select a language.');
+          return;
+        }
+        selectedLang = languageSelect.value;
+        applyTranslations(selectedLang);
+        langSection.classList.remove('active');
+        checkinForm.classList.add('active');
+      });
 
-      checkinForm.classList.remove('active');
-      langSection.classList.add('active');
-    });
+      // Back to language select
+      backBtn.addEventListener('click', () => {
+        checkinForm.reset();
+        languageSelect.value = '';
+        selectedLang = '';
+        applyTranslations('English');
+        checkinForm.classList.remove('active');
+        langSection.classList.add('active');
+      });
 
-    // Cancel video
-    closeBtn.addEventListener('click', () => {
-      if (ytPlayer) {
-        clearInterval(ytPoll);
-        ytPlayer.destroy();
-        ytPlayer = null;
-      }
-      videoContainer.innerHTML = '';
-      videoSection.classList.remove('active');
-      completionSection.style.display = 'none';
-      checkinForm.classList.add('active');
-    });
+      // Cancel video
+      closeBtn.addEventListener('click', () => {
+        if (ytPlayer) {
+          clearInterval(ytPoll);
+          ytPlayer.destroy();
+          ytPlayer = null;
+        }
+        videoContainer.innerHTML = '';
+        videoSection.classList.remove('active');
+        completionSection.style.display = 'none';
+        checkinForm.classList.add('active');
+      });
 
-    // Autofill truck from datalist
-    nameInput.addEventListener('input', () => {
-      const match = driverList.find(d =>
-        d.name.toLowerCase() === nameInput.value.toLowerCase()
-      );
-      truckInput.value = match ? match.truck : '';
-    });
+      // Autofill truck from datalist
+      nameInput.addEventListener('input', () => {
+        const match = driverList.find(d =>
+          d.name.toLowerCase() === nameInput.value.toLowerCase()
+        );
+        truckInput.value = match ? match.truck : '';
+      });
 
-    // Submit & play video
-    checkinForm.addEventListener('submit', async e => {
-      e.preventDefault();
-      submitBtn.disabled = true;
-      startTime = new Date();
+      // Submit & play video
+      checkinForm.addEventListener('submit', async e => {
+        e.preventDefault();
+        if (!nameInput.value.trim() || !truckInput.value.trim()) {
+          alert('Please fill in all fields.');
+          return;
+        }
+        submitBtn.disabled = true;
+        startTime = new Date();
 
-      // Record course start
-      const fd = new FormData();
-      fd.append('name',       nameInput.value);
-      fd.append('truck',      truckInput.value);
-      fd.append('language',   selectedLang);
-      fd.append('videoTitle', videoLinks[selectedLang].title);
-      fd.append('status',     'Course Started');
-      const resp = await fetch(
-        'https://script.google.com/macros/s/AKfycbzUy3d6QTbXcjh-kq0O8OsnKQGrMsQlE9CXSzfwiVbc19avtjsCPP3wA9hjd-CikNZJ/exec',
-        { method: 'POST', body: fd }
-      );
-      rowId = (await resp.json()).row;
+        // Record course start
+        const fd = new FormData();
+        fd.append('name',       nameInput.value);
+        fd.append('truck',      truckInput.value);
+        fd.append('language',   selectedLang);
+        fd.append('videoTitle', videoLinks[selectedLang].title);
+        fd.append('status',     'Course Started');
+        let rowResult;
+        try {
+          const resp = await fetch(
+            'https://script.google.com/macros/s/AKfycbzUy3d6QTbXcjh-kq0O8OsnKQGrMsQlE9CXSzfwiVbc19avtjsCPP3wA9hjd-CikNZJ/exec',
+            { method: 'POST', body: fd }
+          );
+          rowResult = await resp.json();
+        } catch (err) {
+          alert('Network error. Please try again.');
+          submitBtn.disabled = false;
+          return;
+        }
+        rowId = rowResult.row;
 
-      videoNote.innerText = videoLinks[selectedLang].note;
-      checkinForm.classList.remove('active');
-      videoSection.classList.add('active');
+        videoNote.innerText = videoLinks[selectedLang].note;
+        checkinForm.classList.remove('active');
+        videoSection.classList.add('active');
+        completionSection.style.display = 'none';
+        submitBtn.disabled = false;
 
-      // English: YouTube embed
-      if (selectedLang === 'English') {
-        videoContainer.innerHTML = '<div id="ytPlayer"></div>';
-        ytPlayer = new YT.Player('ytPlayer', {
-          videoId: videoLinks.English.videoId,
-          width:   '100%',
-          height:  '390',
-          events: {
-            onReady: event => {
-              event.target.playVideo();
-              ytPoll = setInterval(() => {
-                const remaining = ytPlayer.getDuration() - ytPlayer.getCurrentTime();
-                if (remaining <= 10) {
-                  clearInterval(ytPoll);
-                  completionSection.style.display = 'block';
+        // English: YouTube embed
+        if (selectedLang === 'English') {
+          videoContainer.innerHTML = '<div id="ytPlayer"></div>';
+          window.onYouTubeIframeAPIReady = function () {
+            ytPlayer = new YT.Player('ytPlayer', {
+              videoId: videoLinks.English.videoId,
+              width:   '100%',
+              height:  '390',
+              events: {
+                onReady: event => {
+                  event.target.playVideo();
+                  ytPoll = setInterval(() => {
+                    const remaining = ytPlayer.getDuration() - ytPlayer.getCurrentTime();
+                    if (remaining <= 10) {
+                      clearInterval(ytPoll);
+                      completionSection.style.display = 'block';
+                    }
+                  }, 1000);
                 }
-              }, 1000);
+              }
+            });
+          }
+          // If YouTube API already loaded, call manually:
+          if (window.YT && window.YT.Player) window.onYouTubeIframeAPIReady();
+        } else {
+          // Other languages: native <video>
+          videoContainer.innerHTML =
+            `<video id="trainingVideo" controls src="${videoLinks[selectedLang].url}"></video>`;
+          const tv = document.getElementById('trainingVideo');
+          tv.play();
+          tv.addEventListener('timeupdate', () => {
+            if (tv.duration - tv.currentTime <= 10) {
+              completionSection.style.display = 'block';
             }
-          }
-        });
-      } else {
-        // Other languages: native <video>
-        videoContainer.innerHTML =
-          <video id="trainingVideo" controls src="${videoLinks[selectedLang].url}"></video>;
-        const tv = document.getElementById('trainingVideo');
-        tv.play();
-        tv.addEventListener('timeupdate', () => {
-          if (tv.duration - tv.currentTime <= 10) {
-            completionSection.style.display = 'block';
-          }
-        });
-      }
+          });
+        }
+      });
+
+      // Mark complete
+      completeBtn.addEventListener('click', async () => {
+        const duration = Math.round((new Date() - startTime) / 60000) + ' minutes';
+        const fd2 = new FormData();
+        fd2.append('name',       nameInput.value);
+        fd2.append('truck',      truckInput.value);
+        fd2.append('videoTitle', videoLinks[selectedLang].title);
+        fd2.append('status',     'Completed');
+        fd2.append('duration',   duration);
+        fd2.append('rowId',      rowId);
+
+        let result;
+        try {
+          const resp2 = await fetch(
+            'https://script.google.com/macros/s/AKfycbzUy3d6QTbXcjh-kq0O8OsnKQGrMsQlE9CXSzfwiVbc19avtjsCPP3wA9hjd-CikNZJ/exec',
+            { method: 'POST', body: fd2 }
+          );
+          result = await resp2.json();
+        } catch (e) {
+          alert('Network error. Please try again.');
+          return;
+        }
+        if (result.success) {
+          completionSection.innerHTML = `<h3>${translations[selectedLang].complete}</h3>`;
+          videoContainer.innerHTML = '';
+        } else {
+          alert('⚠️ Failed to mark as complete: ' + result.message);
+        }
+      });
+
+      // Initial translation
+      applyTranslations('English');
     });
 
-    // Mark complete
-    completeBtn.addEventListener('click', async () => {
-      const duration = Math.round((new Date() - startTime) / 60000) + ' minutes';
-      const fd2 = new FormData();
-      fd2.append('name',       nameInput.value);
-      fd2.append('truck',      truckInput.value);
-      fd2.append('videoTitle', videoLinks[selectedLang].title);
-      fd2.append('status',     'Completed');
-      fd2.append('duration',   duration);
-      fd2.append('rowId',      rowId);
-
-      const resp2 = await fetch(
-        'https://script.google.com/macros/s/AKfycbzUy3d6QTbXcjh-kq0O8OsnKQGrMsQlE9CXSzfwiVbc19avtjsCPP3wA9hjd-CikNZJ/exec',
-        { method: 'POST', body: fd2 }
-      );
-      const result = await resp2.json();
-      if (result.success) {
-        completionSection.innerHTML = <h3>${translations[selectedLang].complete}</h3>;
-      } else {
-        alert('⚠️ Failed to mark as complete: ' + result.message);
-      }
-    });
   </script>
-
 </body>
 </html>
