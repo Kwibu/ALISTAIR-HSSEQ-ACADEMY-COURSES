@@ -22,15 +22,6 @@
       background: rgba(255,255,255,0.85);
       z-index: -1;
     }
-    /* Logo styling: fixed at top left */
-    #logo {
-      position: fixed;
-      top: 20px;
-      left: 20px;
-      z-index: 80;
-      max-width: 120px;
-      height: auto;
-    }
     .section {
       display: none;
       text-align: center;
@@ -89,9 +80,6 @@
   <script src="https://www.youtube.com/iframe_api"></script>
 </head>
 <body>
-
-  <!-- Logo in the top right corner -->
-  <img id="logo" src="Logo.png" alt="Alistair Logo" />
 
   <!-- Language selection -->
   <div id="languageSection" class="section active">
@@ -347,7 +335,7 @@
       } else {
         // Other languages: native <video>
         videoContainer.innerHTML =
-          `<video id="trainingVideo" controls src="${videoLinks[selectedLang].url}"></video>`;
+          <video id="trainingVideo" controls src="${videoLinks[selectedLang].url}"></video>;
         const tv = document.getElementById('trainingVideo');
         tv.play();
         tv.addEventListener('timeupdate', () => {
@@ -375,11 +363,12 @@
       );
       const result = await resp2.json();
       if (result.success) {
-        completionSection.innerHTML = `<h3>${translations[selectedLang].complete}</h3>`;
+        completionSection.innerHTML = <h3>${translations[selectedLang].complete}</h3>;
       } else {
         alert('⚠️ Failed to mark as complete: ' + result.message);
       }
     });
   </script>
+
 </body>
 </html>
