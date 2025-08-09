@@ -13,24 +13,37 @@
       --accent:#4CAF50;
       --danger:#f44336;
       --muted:#94a3b8;
+      /* Fluid type/spacing for responsive UI */
+      --fs-base: clamp(14px, 2.8vw, 16px);
+      --fs-h2: clamp(20px, 6vw, 28px);
+      --space: clamp(10px, 2.5vw, 16px);
     }
-    html, body { margin: 0; padding: 0; height: 100%; width: 100%; font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; background: url('trucks.jpg') no-repeat center center fixed; background-size: cover; }
+
+    html, body {
+      margin: 0; padding: 0; height: 100%; width: 100%;
+      font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+      background: url('trucks.jpg') no-repeat center center fixed; background-size: cover;
+      font-size: var(--fs-base);
+    }
     body::before { content: ""; position: fixed; inset: 0; background: rgba(255,255,255,0.85); z-index: -1; }
+
     .section { display: none; padding: 20px; }
     .active  { display: block; }
-    h2 { font-size: 28px; font-weight: 700; color: #222; background: var(--title-bg); display: inline-block; padding: 14px 20px; border-radius: 12px; box-shadow: var(--title-shadow); margin: 0; }
+    h2 { font-size: var(--fs-h2); font-weight: 700; color: #222; background: var(--title-bg); display: inline-block; padding: 14px 20px; border-radius: 12px; box-shadow: var(--title-shadow); margin: 0; }
     .heading-wrap{ display:flex; align-items:center; justify-content:center; margin-bottom:20px; }
 
-    input, select, button { margin: 10px 0; padding: 12px; width: 100%; max-width: 520px; font-size: 16px; border-radius: 10px; border: 1px solid #e5e7eb; }
+    input, select, button { margin: 10px 0; padding: calc(var(--space)*0.75) var(--space); width: 100%; max-width: 520px; font-size: var(--fs-base); border-radius: 10px; border: 1px solid #e5e7eb; }
     button { background-color: var(--accent); color: #fff; border: none; font-weight: 700; cursor: pointer; box-shadow: 0 2px 5px rgba(0,0,0,0.08); }
     .muted { background-color: var(--muted); }
     .danger { background-color: var(--danger); }
     button:disabled { opacity: 0.6; cursor: not-allowed; }
-    .row { display: flex; gap: 16px; flex-wrap: wrap; }
+
+    .row { display: flex; gap: var(--space); flex-wrap: wrap; }
     .card { background:#fff; border-radius: 14px; box-shadow: 0 2px 10px rgba(0,0,0,.08); padding: 16px; flex: 1 1 320px; min-width: 300px; }
     .pill { display:inline-block; font-size:12px; padding:4px 8px; border-radius:999px; background:#eef2ff; color:#3730a3; margin-left:8px; }
-    .tabs { display:flex; gap:8px; margin: 12px 0 16px; align-items:center; }
-    .tab { padding:10px 14px; border-radius: 999px; background:#e5e7eb; cursor:pointer; user-select:none; }
+    .tabs { display:flex; gap:8px; margin: 12px 0 16px; align-items:center; overflow-x:auto; -webkit-overflow-scrolling: touch; scrollbar-width: none; }
+    .tabs::-webkit-scrollbar{ display:none; }
+    .tab { padding:10px 14px; border-radius: 999px; background:#e5e7eb; cursor:pointer; user-select:none; white-space:nowrap; }
     .tab.active { background:var(--brand); color:#fff; }
 
     /* DASH BAR */
@@ -39,9 +52,29 @@
 
     #videoNote { background:#fff; padding: 16px; margin: 12px 0; border-radius:12px; max-width: 820px; box-shadow: var(--title-shadow); font-size: 16px; font-weight: 600; color:#222; white-space: pre-line; }
     #videoContainer { width: 100%; max-height: 80vh; }
-    #videoContainer iframe, #videoContainer video { width: 100%; height: auto; max-height: 70vh; border-radius: 12px; }
+    #videoContainer iframe, #videoContainer video { width: 100%; height: min(56.25vw, 70vh); border-radius: 12px; }
     #completionSection { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background:#ffffffee; padding: 12px 16px; border-radius: 12px; box-shadow: 0 0 10px #ccc; display: none; }
     .toast { position: fixed; top: 12px; left: 50%; transform: translateX(-50%); background:#1f2937; color:#fff; padding: 10px 14px; border-radius: 10px; box-shadow: 0 4px 10px rgba(0,0,0,.2); opacity: .95; font-size: 14px; }
+
+    /* === Mobile improvements === */
+    @media (max-width: 640px){
+      html, body{ background-attachment: scroll; }
+      body::before{ background: rgba(255,255,255,0.92); }
+
+      .dashbar{ flex-wrap: wrap; gap: 8px; }
+      /* Hide desktop-only controls on phones */
+      #syncBtn, #changeDriverBtn{ display: none !important; }
+
+      /* Make cards/tabs neat on small screens */
+      .card{ min-width: auto; flex: 1 1 100%; }
+      .driver-badge{ font-size: 12px; }
+
+      /* Tuck the completion button to a corner on phones */
+      #completionSection{ right: 12px; left: auto; bottom: 12px; transform: none; }
+
+      /* Larger touch targets */
+      button{ padding: 14px; }
+    }
   </style>
   <script src="https://www.youtube.com/iframe_api"></script>
 </head>
@@ -50,13 +83,7 @@
   <div id="languageSection" class="section active" style="text-align:center">
     <div class="heading-wrap"><h2 id="langTitle">Select Language / Chagua Lugha / Saleni Ululimi / Selecione o Idioma</h2></div>
     <div style="max-width:520px;margin:0 auto">
-      <select id="languageSelect" required>
-        <option value="">-- Choose a Language --</option>
-        <option value="English">English</option>
-        <option value="Swahili">Swahili</option>
-        <option value="Bemba">Bemba</option>
-        <option value="Portuguese">Portuguese</option>
-      </select>
+      <select id="languageSelect" required></select>
       <button type="button" id="continueBtn">Continue</button>
     </div>
   </div>
@@ -126,22 +153,76 @@
     const LS_KEY_PENDING_COMPLETIONS = 'driver_training_pending_completions_v1';
     const LS_KEY_LANG = 'driver_training_lang_v1';
     const LS_KEY_LOBBY_SORT = 'driver_training_lobby_sort_v1';
+    const LS_KEY_CUSTOM_LANGS = 'driver_training_custom_langs_v1'; // { [lang]: {translations, videos} }
+    const LS_DRIVER_STATE_PREFIX = 'driver_training_driverstate_'; // + encode(name|truck)
 
-    // === i18n === (refined, respectful wording)
-    const translations = {
+    // === Built-in i18n ===
+    const baseTranslations = {
       English: { code:'en', dir:'ltr', langTitle:'Select Language', pageTitle:'Driver Check-In', continue:'Continue', back:'⬅️ Back', cancel:'❌ Cancel Video', formTitle:'Driver Check-In', name:'Full Name', truck:'Truck Number', submit:'Continue to Dashboard', complete:'Course Completed Successfully!', dash:'Training Dashboard', lobby:'Lobby (Assigned)', history:'History (Completed)', sync:'Sync Pending', change:'Change Driver', play:'Play', status:'Status', assigned:'Assigned', duration:'Duration', noPending:'No pending trainings. Great job!', noHistory:'No completed trainings yet.', loadingVideo:'Loading video, please wait...', dashboardLogin:'Dashboard Login', sort:'Sort', recent:'Recent', oldest:'Oldest' },
       Swahili: { code:'sw', dir:'ltr', langTitle:'Chagua Lugha', pageTitle:'Kuingia kwa Dereva', continue:'Endelea', back:'⬅️ Rudi', cancel:'❌ Sitisha Video', formTitle:'Kuingia kwa Dereva', name:'Jina Kamili', truck:'Namba ya Gari', submit:'Nenda kwenye Dashibodi', complete:'Nimekamilisha Kozi', dash:'Dashibodi ya Mafunzo', lobby:'Ukumbi (Zilizokabidhiwa)', history:'Historia (Zilizokamilika)', sync:'Sawazisha', change:'Badilisha Dereva', play:'Cheza', status:'Hali', assigned:'Iliyokabidhiwa', duration:'Muda', noPending:'Hakuna mafunzo yanayosubiri. Kazi nzuri!', noHistory:'Bado hakuna mafunzo yaliyokamilika.', loadingVideo:'Inapakia video, tafadhali subiri...', dashboardLogin:'Kuingia Dashibodi', sort:'Panga', recent:'Za Hivi Karibuni', oldest:'Za Zamani' },
       Bemba: { code:'bem', dir:'ltr', langTitle:'Sankeni Ululimi', pageTitle:'Ifyebo fya Kwingilila', continue:'Tendekela', back:'⬅️ Baya', cancel:'❌ Fumya Video', formTitle:'Ifyebo fya Kwingilila', name:'Amashina Yonse', truck:'Namba ya Motoka', submit:'Ya ku Dashboard', complete:'Nasheya ukucita bwino!', dash:'Dashboard ya Ifyakusambilila', lobby:'Lobby (Ifyasalwike)', history:'Historia (Fyapwa)', sync:'Sync', change:'Chinja Umupashi', play:'Tamba', status:'Inshita', assigned:'Lyasangwa', duration:'Ubushiku', noPending:'Tapali ifyasangwa. Umucinshi!', noHistory:'Tachapwa nangu kamo pano.', loadingVideo:'Ukupakila video, pelako umutende...', dashboardLogin:'Ukwingila pa Dashboard', sort:'Teekanya', recent:'Ifyapya', oldest:'Ifyakale' },
       Portuguese: { code:'pt', dir:'ltr', langTitle:'Selecione o Idioma', pageTitle:'Registro do Motorista', continue:'Continuar', back:'⬅️ Voltar', cancel:'❌ Cancelar Vídeo', formTitle:'Registro do Motorista', name:'Nome Completo', truck:'Número do Caminhão', submit:'Ir para o Painel', complete:'✅ Curso concluído com sucesso!', dash:'Painel de Treinamentos', lobby:'Lobby (Atribuídos)', history:'Histórico (Concluídos)', sync:'Sincronizar', change:'Trocar Motorista', play:'Reproduzir', status:'Estado', assigned:'Atribuído', duration:'Duração', noPending:'Sem treinamentos pendentes. Bom trabalho!', noHistory:'Ainda não há treinamentos concluídos.', loadingVideo:'Carregando o vídeo, aguarde...', dashboardLogin:'Acesso ao Painel', sort:'Ordenar', recent:'Mais recentes', oldest:'Mais antigas' }
     };
 
-    // === Videos catalog ===
-    const videoLinks = {
-      English:   { type:'youtube', videoId:'fVl88Q5DJ2w', title:'Driver Tiredness, Fatigue and Road Safety', note:'Please watch the full video. The completion button appears after 40 seconds watched, or near the end. Seeking and fast-forward are disabled.' },
-      Swahili:   { type:'mp4', url:'https://raw.githubusercontent.com/Kwibu/API-3-Test/main/Safety%20Campaign%20for%20drivers%20(Swahili).mp4', title:'Kampeni ya Usalama kwa Madereva', note:'Tazama video yote. Kitufe cha kukamilisha kitaonekana baada ya sekunde 40 au karibu kumaliza. Kusogeza mbele kumezuiwa.' },
-      Bemba:     { type:'mp4', url:'https://raw.githubusercontent.com/Kwibu/API-3-Test/main/Safety%20Campaign%20for%20drivers%20(Bemba).mp4',   title:'Kampeni ya Ukusalama kwa Abapashi', note:'Lolekesha yonse. Batani ya kukwata ilaboneka pali seconds 40. Ukupepa panseko kwakanwa.' },
-      Portuguese:{ type:'mp4', url:'https://raw.githubusercontent.com/Kwibu/API-3-Test/main/Safety%20Campaign%20for%20drivers%20(Portugal).mp4', title:'Campanha de Segurança para Motoristas', note:'Assista ao vídeo completo. O botão aparece após 40s ou no final. Avanço rápido bloqueado.' }
+    // === Built-in catalog ===
+    const baseVideoLinks = {
+      English:   [ { id:'eng-001', type:'youtube', videoId:'fVl88Q5DJ2w', title:'Driver Tiredness, Fatigue and Road Safety' } ],
+      Swahili:   [ { id:'swa-002', type:'mp4', url:'https://raw.githubusercontent.com/Kwibu/API-3-Test/main/Safety%20Campaign%20for%20drivers%20(Swahili).mp4', title:'Kampeni ya Usalama kwa Madereva' } ],
+      Bemba:     [ { id:'bem-003', type:'mp4', url:'https://raw.githubusercontent.com/Kwibu/API-3-Test/main/Safety%20Campaign%20for%20drivers%20(Bemba).mp4',   title:'Kampeni ya Ukusalama kwa Abapashi' } ],
+      Portuguese:[ { id:'por-004', type:'mp4', url:'https://raw.githubusercontent.com/Kwibu/API-3-Test/main/Safety%20Campaign%20for%20drivers%20(Portugal).mp4', title:'Campanha de Segurança para Motoristas' } ]
     };
+
+    // === Helpers: language storage (the "box") ===
+    function loadCustomLangs(){
+      try{ return JSON.parse(localStorage.getItem(LS_KEY_CUSTOM_LANGS)||'{}'); }catch{ return {}; }
+    }
+    function saveCustomLangs(obj){ localStorage.setItem(LS_KEY_CUSTOM_LANGS, JSON.stringify(obj||{})); }
+
+    function getTranslations(){
+      const custom = loadCustomLangs();
+      const out = { ...baseTranslations };
+      Object.entries(custom).forEach(([lang, payload])=>{
+        if (payload.translations){ out[lang] = { ...baseTranslations.English, ...payload.translations }; }
+      });
+      return out;
+    }
+    function getVideoLinks(){
+      const custom = loadCustomLangs();
+      const out = JSON.parse(JSON.stringify(baseVideoLinks));
+      Object.entries(custom).forEach(([lang, payload])=>{
+        if (payload.videos && Array.isArray(payload.videos)){
+          out[lang] = (out[lang]||[]).concat(payload.videos);
+        }
+      });
+      return out;
+    }
+    // Expose a simple API to add languages programmatically (from DevTools or future admin UI)
+    window.addLanguage = function(langName, i18nFields, videosArray){
+      const custom = loadCustomLangs();
+      custom[langName] = custom[langName] || {};
+      if (i18nFields) custom[langName].translations = { ...(custom[langName].translations||{}), ...i18nFields };
+      if (Array.isArray(videosArray)) custom[langName].videos = (custom[langName].videos||[]).concat(videosArray);
+      saveCustomLangs(custom);
+      if (typeof window.populateLanguageSelect === 'function') {
+        window.populateLanguageSelect();
+      }
+      alert(`Language "${langName}" saved. Reload or re-open to use.`);
+    }
+
+    // === Per-driver state (history/lobby) ===
+    function driverKey(){ return `${driver.name}|${driver.truck}`.toLowerCase().trim(); }
+    function driverStateKey(){ return LS_DRIVER_STATE_PREFIX + encodeURIComponent(driverKey()); }
+    function loadDriverState(){
+      try{ return JSON.parse(localStorage.getItem(driverStateKey())||'{}'); }catch{ return {}; }
+    }
+    function saveDriverState(state){ localStorage.setItem(driverStateKey(), JSON.stringify(state||{})); }
+
+    function markWatched(assignmentId){
+      const st = loadDriverState();
+      st.watched = st.watched || {};
+      st.watched[assignmentId] = true;
+      saveDriverState(st);
+    }
 
     // === App State ===
     let selectedLang = localStorage.getItem(LS_KEY_LANG) || 'English';
@@ -175,6 +256,7 @@
     }
 
     async function fetchAssignments(name, truck){
+      // Try server first to get assignments; fall back to local catalog when offline
       try {
         const url = `https://script.google.com/macros/s/AKfycbzUy3d6QTbXcjh-kq0O8OsnKQGrMsQlE9CXSzfwiVbc19avtjsCPP3wA9hjd-CikNZJ/exec?mode=assignments&name=${encodeURIComponent(name)}&truck=${encodeURIComponent(truck)}`;
         const r = await fetch(url);
@@ -182,12 +264,17 @@
           const json = await r.json();
           if (Array.isArray(json.assignments)) return json.assignments;
         }
-      } catch(e){ /* fallback below */ }
-      return [
-        { id:'eng-001', title: videoLinks.English.title, language:'English', source:{ type:'youtube', videoId: videoLinks.English.videoId }, status:'assigned', assignedAt: '2025-07-30' },
-        { id:'swa-002', title: videoLinks.Swahili.title, language:'Swahili', source:{ type:'mp4', url: videoLinks.Swahili.url }, status:'assigned', assignedAt: '2025-08-01' },
-        { id:'old-compl', title: 'Defensive Driving Basics', language:'English', source:{ type:'youtube', videoId:'dQw4w9WgXcQ' }, status:'completed', completedAt:'2025-07-15', duration:'3 minutes' }
-      ];
+      } catch(e){ /* offline fallback below */ }
+
+      // Fallback: build from local catalog for all languages
+      const vmap = getVideoLinks();
+      const all = [];
+      Object.entries(vmap).forEach(([lang, list])=>{
+        list.forEach(v=>{
+          all.push({ id: v.id, title: v.title, language: lang, source: v, status: 'assigned', assignedAt: new Date().toISOString().slice(0,10) });
+        })
+      });
+      return all;
     }
 
     async function postTrainingEvent(payload){
@@ -214,7 +301,7 @@
     document.addEventListener('DOMContentLoaded', function(){
       loadDrivers();
 
-      // Refs
+      // Refs (declare BEFORE any function uses them)
       const langSection   = $('languageSection');
       const checkinForm   = $('checkinForm');
       const dashboard     = $('dashboardSection');
@@ -245,9 +332,19 @@
       const closeBtn      = $('closeBtn');
       const activeVideoTitle = $('activeVideoTitle');
 
+      // Build language options dynamically (built-in + custom)
+      function populateLanguageSelect(){
+        const tmap = getTranslations();
+        const opts = Object.keys(tmap);
+        languageSelect.innerHTML = '<option value="">-- Choose a Language --</option>' + opts.map(o=>`<option value="${o}">${o}</option>`).join('');
+        languageSelect.value = selectedLang;
+      }
+      window.populateLanguageSelect = populateLanguageSelect; // expose for addLanguage()
+
       // i18n application across all screens
+      function tFor(lang){ const map = getTranslations(); return map[lang] || map.English; }
       function applyTranslations(lang){
-        const t = translations[lang] || translations.English;
+        const t = tFor(lang);
         document.documentElement.lang = t.code || 'en';
         document.documentElement.dir  = t.dir || 'ltr';
         $('langTitle').innerText = t.langTitle || 'Select Language';
@@ -271,7 +368,8 @@
         $('completeBtn').innerText = t.complete;
       }
 
-      // Initialize language from storage and set select
+      // Populate select and apply i18n AFTER refs exist
+      populateLanguageSelect();
       languageSelect.value = selectedLang;
       applyTranslations(selectedLang);
 
@@ -304,13 +402,16 @@
 
         let assignments = await fetchAssignments(driver.name, driver.truck);
 
+        // Persist preferred language per driver
+        const st0 = loadDriverState(); st0.lang = selectedLang; saveDriverState(st0);
+
         driverBadge.textContent = `${driver.name} • ${driver.truck}`; // RIGHT
         applyTranslations(selectedLang); // ensure dashboard UI is localized
         renderDashboard(assignments);
         checkinForm.classList.remove('active'); dashboard.classList.add('active');
         submitBtn.disabled = false;
 
-        try { await postTrainingEvent({ name: driver.name, truck: driver.truck, language: selectedLang, videoTitle: (translations[selectedLang]||translations.English).dashboardLogin, status: 'Session Start' }); } catch(e){ /* queued */ }
+        try { await postTrainingEvent({ name: driver.name, truck: driver.truck, language: selectedLang, videoTitle: tFor(selectedLang).dashboardLogin, status: 'Session Start' }); } catch(e){ /* queued */ }
       });
 
       function setActiveTab(tabName){
@@ -330,9 +431,18 @@
 
       function renderDashboard(assignments){
         window.__assignments = assignments;
-        const t = translations[selectedLang] || translations.English;
-        const pending = assignments.filter(a=>a.status !== 'completed');
-        // sort by assignedAt according to lobbySort
+        const t = tFor(selectedLang);
+        const st = loadDriverState();
+        const watched = st.watched || {};
+
+        // Filter by selected language only
+        const inLang = assignments.filter(a=> (a.language||selectedLang) === selectedLang);
+
+        // Recompute statuses from driver state
+        inLang.forEach(a=>{ if (watched[a.id]) { a.status = 'completed'; if (!a.completedAt) a.completedAt = new Date().toISOString().slice(0,10); } });
+
+        // Pending (unwatched)
+        const pending = inLang.filter(a=>a.status !== 'completed');
         pending.sort((a,b)=>{
           const da = Date.parse(a.assignedAt||'');
           const db = Date.parse(b.assignedAt||'');
@@ -344,7 +454,8 @@
         lobbyEmpty.style.display = pending.length ? 'none' : 'block';
         pending.forEach(a=> lobbyList.appendChild(makeAssignmentCard(a, true, t)));
 
-        const done = assignments.filter(a=>a.status === 'completed');
+        // History (watched)
+        const done = inLang.filter(a=>a.status === 'completed');
         historyList.innerHTML = '';
         historyEmpty.style.display = done.length ? 'none' : 'block';
         done.forEach(a=> historyList.appendChild(makeAssignmentCard(a, false, t)));
@@ -376,24 +487,29 @@
         $('videoSection').classList.add('active');
 
         activeVideoTitle.textContent = a.title;
-        const catalog = translations[selectedLang];
-        $('videoNote').innerText = (videoLinks[selectedLang] && videoLinks[selectedLang].note) ? videoLinks[selectedLang].note : (catalog ? catalog.loadingVideo : 'Loading video...');
+        const catalog = tFor(selectedLang);
+        const vmap = getVideoLinks();
+        const langList = vmap[selectedLang]||[];
+        const meta = langList.find(v=>v.id===a.id) || {};
+        $('videoNote').innerText = (meta.note) || (catalog ? catalog.loadingVideo : 'Loading video...');
         $('completionSection').style.display = 'none';
         videoContainer.innerHTML = '';
 
-        if (a.source?.type === 'youtube') {
+        if (a.source?.type === 'youtube' || meta.type==='youtube') {
+          const videoId = a.source?.videoId || meta.videoId;
           videoContainer.innerHTML = '<div id="ytPlayer"></div>';
           window.onYouTubeIframeAPIReady = function () {
             ytPlayer = new YT.Player('ytPlayer', {
-              videoId: a.source.videoId,
+              videoId,
               width: '100%', height: '390',
               playerVars: { controls: 1, disablekb: 1, fs: 0, modestbranding: 1, rel: 0, iv_load_policy: 3, playsinline: 1 },
               events: { onReady: onYTReady, onStateChange: onYTState }
             });
           };
           if (window.YT && window.YT.Player) window.onYouTubeIframeAPIReady();
-        } else if (a.source?.type === 'mp4') {
-          videoContainer.innerHTML = `<video id="trainingVideo" controls controlsList="nodownload noplaybackrate noremoteplayback" disablepictureinpicture playsinline src="${a.source.url}"></video>`;
+        } else if (a.source?.type === 'mp4' || meta.type==='mp4') {
+          const url = a.source?.url || meta.url;
+          videoContainer.innerHTML = `<video id="trainingVideo" controls controlsList="nodownload noplaybackrate noremoteplayback" disablepictureinpicture playsinline src="${url}"></video>`;
           const tv = $('trainingVideo');
           tv.playbackRate = 1; tv.addEventListener('ratechange', ()=>{ if (tv.playbackRate !== 1) tv.playbackRate = 1; });
           tv.addEventListener('seeking', ()=>{ if (tv.currentTime > maxAllowedTime + ALLOW_SEEK_TOLERANCE) tv.currentTime = maxAllowedTime; });
@@ -435,9 +551,13 @@
         const payload = { name: driver.name, truck: driver.truck, videoTitle: currentAssignment?.title || 'Unknown', status:'Completed', duration: `${durationMin} minutes`, rowId, assignmentId: currentAssignment?.id };
         let ok = true;
         try { await postTrainingEvent(payload); } catch(e){ ok = false; }
-        $('completionSection').innerHTML = `<h3>${(translations[selectedLang]||translations.English).complete}</h3>`;
+        $('completionSection').innerHTML = `<h3>${tFor(selectedLang).complete}</h3>`;
         videoContainer.innerHTML = '';
 
+        // Persist watched
+        if (currentAssignment?.id) markWatched(currentAssignment.id);
+
+        // Update in-memory list
         if (window.__assignments && currentAssignment){
           const idx = window.__assignments.findIndex(x=>x.id===currentAssignment.id);
           if (idx>-1){ window.__assignments[idx].status='completed'; window.__assignments[idx].completedAt = new Date().toISOString().slice(0,10); window.__assignments[idx].duration = `${durationMin} minutes`; }
@@ -450,10 +570,24 @@
       $('completeBtn').addEventListener('click', submitCompletion);
       closeBtn.addEventListener('click', ()=>{ clearInterval(progressPoll); if (ytPlayer) { try { ytPlayer.destroy(); } catch(e){} ytPlayer = null; } $('videoSection').classList.remove('active'); $('dashboardSection').classList.add('active'); $('completionSection').style.display='none'; videoContainer.innerHTML=''; applyTranslations(selectedLang); });
 
+      // === Lightweight self-tests (open with ?test=1) ===
+      function runSelfTests(){
+        const results = [];
+        try { results.push({ test:'languageSelect exists', ok: !!languageSelect }); } catch(e){ results.push({ test:'languageSelect exists', ok:false, error:e.message }); }
+        try { populateLanguageSelect(); results.push({ test:'populateLanguageSelect callable after refs', ok:true }); } catch(e){ results.push({ test:'populateLanguageSelect callable after refs', ok:false, error:e.message }); }
+        try {
+          const vids = getVideoLinks();
+          const langs = Object.keys(vids);
+          results.push({ test:'catalog languages >=1', ok: langs.length>0, count: langs.length });
+        } catch(e){ results.push({ test:'catalog available', ok:false, error:e.message }); }
+        console.table(results);
+        if (results.some(r=>!r.ok)) toast('Some self-tests failed. See console.');
+      }
+      if (new URLSearchParams(location.search).get('test') === '1') runSelfTests();
+
       // Ensure UI starts in the stored language on first paint
       applyTranslations(selectedLang);
     });
   </script>
 </body>
 </html>
-
