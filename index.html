@@ -4,35 +4,51 @@
   <meta charset="UTF-8" />
   <title>Driver Check-In</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
   <style>
-    html, body { margin: 0; padding: 0; height: 100%; width: 100%; font-family: Arial, sans-serif; background: url('trucks.jpg') no-repeat center center fixed; background-size: cover; }
+    :root{
+      --title-bg:#ffffff;
+      --title-shadow:0 2px 8px rgba(0,0,0,0.12);
+      --brand:#111827;
+      --accent:#4CAF50;
+      --danger:#f44336;
+      --muted:#94a3b8;
+    }
+    html, body { margin: 0; padding: 0; height: 100%; width: 100%; font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; background: url('trucks.jpg') no-repeat center center fixed; background-size: cover; }
     body::before { content: ""; position: fixed; inset: 0; background: rgba(255,255,255,0.85); z-index: -1; }
     .section { display: none; padding: 20px; }
     .active  { display: block; }
-    h2 { font-size: 28px; font-weight: bold; color: #222; background: #fff; display: inline-block; padding: 16px 24px; border-radius: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.15); margin-bottom: 20px; }
-    input, select, button { margin: 10px 0; padding: 12px; width: 100%; max-width: 520px; font-size: 16px; }
-    button { background-color: #4CAF50; color: #fff; border: none; font-weight: bold; cursor: pointer; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
-    .muted { background-color: #94a3b8; }
-    .danger { background-color: #f44336; }
+    h2 { font-size: 28px; font-weight: 700; color: #222; background: var(--title-bg); display: inline-block; padding: 14px 20px; border-radius: 12px; box-shadow: var(--title-shadow); margin: 0; }
+    .heading-wrap{ display:flex; align-items:center; justify-content:center; margin-bottom:20px; }
+
+    input, select, button { margin: 10px 0; padding: 12px; width: 100%; max-width: 520px; font-size: 16px; border-radius: 10px; border: 1px solid #e5e7eb; }
+    button { background-color: var(--accent); color: #fff; border: none; font-weight: 700; cursor: pointer; box-shadow: 0 2px 5px rgba(0,0,0,0.08); }
+    .muted { background-color: var(--muted); }
+    .danger { background-color: var(--danger); }
     button:disabled { opacity: 0.6; cursor: not-allowed; }
     .row { display: flex; gap: 16px; flex-wrap: wrap; }
-    .card { background:#fff; border-radius: 12px; box-shadow: 0 2px 10px rgba(0,0,0,.08); padding: 16px; flex: 1 1 320px; min-width: 300px; }
+    .card { background:#fff; border-radius: 14px; box-shadow: 0 2px 10px rgba(0,0,0,.08); padding: 16px; flex: 1 1 320px; min-width: 300px; }
     .pill { display:inline-block; font-size:12px; padding:4px 8px; border-radius:999px; background:#eef2ff; color:#3730a3; margin-left:8px; }
-    .tabs { display:flex; gap:8px; margin: 12px 0 16px; }
+    .tabs { display:flex; gap:8px; margin: 12px 0 16px; align-items:center; }
     .tab { padding:10px 14px; border-radius: 999px; background:#e5e7eb; cursor:pointer; user-select:none; }
-    .tab.active { background:#111827; color:#fff; }
-    #videoNote { background:#fff; padding: 16px; margin: 12px 0; border-radius:10px; max-width: 820px; box-shadow: 0 2px 8px rgba(0,0,0,0.15); font-size: 16px; font-weight: 600; color:#222; white-space: pre-line; }
+    .tab.active { background:var(--brand); color:#fff; }
+
+    /* DASH BAR */
+    .dashbar{ display:flex; align-items:center; justify-content:space-between; gap:12px; margin-bottom:16px; }
+    .driver-badge{ font-weight:600; font-size:14px; background:#111827; color:#fff; padding:8px 12px; border-radius:999px; box-shadow: var(--title-shadow); white-space:nowrap; }
+
+    #videoNote { background:#fff; padding: 16px; margin: 12px 0; border-radius:12px; max-width: 820px; box-shadow: var(--title-shadow); font-size: 16px; font-weight: 600; color:#222; white-space: pre-line; }
     #videoContainer { width: 100%; max-height: 80vh; }
-    #videoContainer iframe, #videoContainer video { width: 100%; height: auto; max-height: 70vh; }
-    #completionSection { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background:#ffffffee; padding: 12px 16px; border-radius: 10px; box-shadow: 0 0 10px #ccc; display: none; }
-    .toast { position: fixed; top: 12px; left: 50%; transform: translateX(-50%); background:#1f2937; color:#fff; padding: 10px 14px; border-radius: 8px; box-shadow: 0 4px 10px rgba(0,0,0,.2); opacity: .95; font-size: 14px; }
+    #videoContainer iframe, #videoContainer video { width: 100%; height: auto; max-height: 70vh; border-radius: 12px; }
+    #completionSection { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background:#ffffffee; padding: 12px 16px; border-radius: 12px; box-shadow: 0 0 10px #ccc; display: none; }
+    .toast { position: fixed; top: 12px; left: 50%; transform: translateX(-50%); background:#1f2937; color:#fff; padding: 10px 14px; border-radius: 10px; box-shadow: 0 4px 10px rgba(0,0,0,.2); opacity: .95; font-size: 14px; }
   </style>
   <script src="https://www.youtube.com/iframe_api"></script>
 </head>
 <body>
   <!-- Language selection -->
   <div id="languageSection" class="section active" style="text-align:center">
-    <h2>Select Language / Chagua Lugha / Saleni Ululimi / Selecione o Idioma</h2>
+    <div class="heading-wrap"><h2 id="langTitle">Select Language / Chagua Lugha / Saleni Ululimi / Selecione o Idioma</h2></div>
     <div style="max-width:520px;margin:0 auto">
       <select id="languageSelect" required>
         <option value="">-- Choose a Language --</option>
@@ -47,7 +63,7 @@
 
   <!-- Check-in form -->
   <form id="checkinForm" class="section" autocomplete="off" style="text-align:center">
-    <h2 id="formTitle">Driver Check-In</h2>
+    <div class="heading-wrap"><h2 id="formTitle">Driver Check-In</h2></div>
     <div style="max-width:520px;margin:0 auto">
       <input type="text" id="name" list="driverNames" placeholder="Full Name" required />
       <datalist id="driverNames"></datalist>
@@ -61,10 +77,14 @@
 
   <!-- DASHBOARD: Lobby & History -->
   <div id="dashboardSection" class="section">
-    <h2 id="dashTitle">Training Dashboard <span class="pill" id="driverBadge"></span></h2>
+    <div class="dashbar">
+      <h2 id="dashTitle">Training Dashboard</h2>
+      <div id="driverBadge" class="driver-badge">—</div>
+    </div>
     <div class="tabs">
-      <div class="tab active" data-tab="lobby">Lobby (Assigned)</div>
-      <div class="tab" data-tab="history">History (Completed)</div>
+      <div class="tab active" data-tab="lobby" id="tabLobby">Lobby (Assigned)</div>
+      <div class="tab" data-tab="history" id="tabHistory">History (Completed)</div>
+      <button id="sortBtn" class="muted" style="max-width:220px">Sort: Recent</button>
       <div style="flex:1"></div>
       <button id="syncBtn" class="muted" style="max-width:200px">Sync Pending</button>
       <button id="changeDriverBtn" class="danger" style="max-width:200px">Change Driver</button>
@@ -104,16 +124,18 @@
 
     // Storage keys
     const LS_KEY_PENDING_COMPLETIONS = 'driver_training_pending_completions_v1';
+    const LS_KEY_LANG = 'driver_training_lang_v1';
+    const LS_KEY_LOBBY_SORT = 'driver_training_lobby_sort_v1';
 
-    // === i18n ===
+    // === i18n === (refined, respectful wording)
     const translations = {
-      English: { pageTitle:'Driver Check-In', continue:'Continue', back:'⬅️ Back', cancel:'❌ Cancel Video', formTitle:'Driver Check-In', name:'Full Name', truck:'Truck Number', submit:'Continue to Dashboard', complete:'Course Completed Successfully!', dash:'Training Dashboard', lobby:'Lobby (Assigned)', history:'History (Completed)', sync:'Sync Pending', change:'Change Driver' },
-      Swahili: { pageTitle:'Kuingia kwa Dereva', continue:'Endelea', back:'⬅️ Rudi', cancel:'❌ Sitisha Video', formTitle:'Kuingia kwa Dereva', name:'Jina Kamili', truck:'Namba ya Gari', submit:'Nenda kwenye Dasibodi', complete:'Nimekamilisha Kozi', dash:'Dasibodi ya Mafunzo', lobby:'Ukumbi (Yaliyokabidhiwa)', history:'Historia (Yalikamilika)', sync:'Sawazisha', change:'Badili Dereva' },
-      Bemba:   { pageTitle:'Ifyebo fya Kwingilila', continue:'Tendekela', back:'⬅️ Baya', cancel:'❌ Fumya Video', formTitle:'Ifyebo fya Kwingilila', name:'Amashina', truck:'Namba ya Motoka', submit:'Ya ku Dashboard', complete:'Nasheya Ukufwaya', dash:'Dashboard ya Ifyakusambilila', lobby:'Lobby (Ifyasalwike)', history:'Historia (Fyapwa)', sync:'Sync', change:'Change Driver' },
-      Portuguese:{ pageTitle:'Registro do Motorista', continue:'Continuar', back:'⬅️ Voltar', cancel:'❌ Cancelar Vídeo', formTitle:'Registro do Motorista', name:'Nome Completo', truck:'Número do Caminhão', submit:'Ir para o Painel', complete:'✅ Curso concluído com sucesso!', dash:'Painel de Treinamentos', lobby:'Lobby (Atribuídos)', history:'Histórico (Concluídos)', sync:'Sincronizar', change:'Trocar Motorista' }
+      English: { code:'en', dir:'ltr', langTitle:'Select Language', pageTitle:'Driver Check-In', continue:'Continue', back:'⬅️ Back', cancel:'❌ Cancel Video', formTitle:'Driver Check-In', name:'Full Name', truck:'Truck Number', submit:'Continue to Dashboard', complete:'Course Completed Successfully!', dash:'Training Dashboard', lobby:'Lobby (Assigned)', history:'History (Completed)', sync:'Sync Pending', change:'Change Driver', play:'Play', status:'Status', assigned:'Assigned', duration:'Duration', noPending:'No pending trainings. Great job!', noHistory:'No completed trainings yet.', loadingVideo:'Loading video, please wait...', dashboardLogin:'Dashboard Login', sort:'Sort', recent:'Recent', oldest:'Oldest' },
+      Swahili: { code:'sw', dir:'ltr', langTitle:'Chagua Lugha', pageTitle:'Kuingia kwa Dereva', continue:'Endelea', back:'⬅️ Rudi', cancel:'❌ Sitisha Video', formTitle:'Kuingia kwa Dereva', name:'Jina Kamili', truck:'Namba ya Gari', submit:'Nenda kwenye Dasibodi', complete:'Nimekamilisha Kozi', dash:'Dasibodi ya Mafunzo', lobby:'Ukumbi (Zilizokabidhiwa)', history:'Historia (Zilizokamilika)', sync:'Sawazisha', change:'Badilisha Dereva', play:'Cheza', status:'Hali', assigned:'Iliyokabidhiwa', duration:'Muda', noPending:'Hakuna mafunzo yanayosubiri. Kazi nzuri!', noHistory:'Bado hakuna mafunzo yaliyokamilika.', loadingVideo:'Inapakia video, tafadhali subiri...', dashboardLogin:'Kuingia Dasibodi', sort:'Panga', recent:'Za Hivi Karibuni', oldest:'Za Zamani' },
+      Bemba: { code:'bem', dir:'ltr', langTitle:'Sankeni Ululimi', pageTitle:'Ifyebo fya Kwingilila', continue:'Tendekela', back:'⬅️ Baya', cancel:'❌ Fumya Video', formTitle:'Ifyebo fya Kwingilila', name:'Amashina Yonse', truck:'Namba ya Motoka', submit:'Ya ku Dashboard', complete:'Nasheya ukucita bwino!', dash:'Dashboard ya Ifyakusambilila', lobby:'Lobby (Ifyasalwike)', history:'Historia (Fyapwa)', sync:'Sync', change:'Chinja Umupashi', play:'Tamba', status:'Inshita', assigned:'Lyasangwa', duration:'Ubushiku', noPending:'Tapali ifyasangwa. Umucinshi!', noHistory:'Tachapwa nangu kamo pano.', loadingVideo:'Ukupakila video, pelako umutende...', dashboardLogin:'Ukwingila pa Dashboard', sort:'Teekanya', recent:'Ifyapya', oldest:'Ifyakale' },
+      Portuguese: { code:'pt', dir:'ltr', langTitle:'Selecione o Idioma', pageTitle:'Registro do Motorista', continue:'Continuar', back:'⬅️ Voltar', cancel:'❌ Cancelar Vídeo', formTitle:'Registro do Motorista', name:'Nome Completo', truck:'Número do Caminhão', submit:'Ir para o Painel', complete:'✅ Curso concluído com sucesso!', dash:'Painel de Treinamentos', lobby:'Lobby (Atribuídos)', history:'Histórico (Concluídos)', sync:'Sincronizar', change:'Trocar Motorista', play:'Reproduzir', status:'Estado', assigned:'Atribuído', duration:'Duração', noPending:'Sem treinamentos pendentes. Bom trabalho!', noHistory:'Ainda não há treinamentos concluídos.', loadingVideo:'Carregando o vídeo, aguarde...', dashboardLogin:'Acesso ao Painel', sort:'Ordenar', recent:'Mais recentes', oldest:'Mais antigas' }
     };
 
-    // === Videos catalog (fallback text + per-language singletons) ===
+    // === Videos catalog ===
     const videoLinks = {
       English:   { type:'youtube', videoId:'fVl88Q5DJ2w', title:'Driver Tiredness, Fatigue and Road Safety', note:'Please watch the full video. The completion button appears after 40 seconds watched, or near the end. Seeking and fast-forward are disabled.' },
       Swahili:   { type:'mp4', url:'https://raw.githubusercontent.com/Kwibu/API-3-Test/main/Safety%20Campaign%20for%20drivers%20(Swahili).mp4', title:'Kampeni ya Usalama kwa Madereva', note:'Tazama video yote. Kitufe cha kukamilisha kitaonekana baada ya sekunde 40 au karibu kumaliza. Kusogeza mbele kumezuiwa.' },
@@ -122,7 +144,8 @@
     };
 
     // === App State ===
-    let selectedLang = '';
+    let selectedLang = localStorage.getItem(LS_KEY_LANG) || 'English';
+    let lobbySort = localStorage.getItem(LS_KEY_LOBBY_SORT) || 'recent';
     let startTime, rowId, ytPlayer, progressPoll;
     let maxAllowedTime = 0;  // anti-seek guard (sec)
     let watchedSeconds = 0;  // cumulative actually viewed (sec)
@@ -141,7 +164,6 @@
     function enqueuePending(payload){ const list = pendingCompletions(); list.push(payload); savePendingCompletions(list); }
 
     // === Data I/O ===
-    // 1) Drivers list for auto-complete
     async function loadDrivers() {
       try {
         const res = await fetch('https://script.google.com/macros/s/AKfycbyUqJCIYWHwTZeAeOCkUDAt3kHvEgoAZj4X8kOJtqu9gL24gUBSQHwzlQ6jqfpeHxJQOA/exec');
@@ -152,17 +174,15 @@
       } catch (e) { /* silent */ }
     }
 
-    // 2) Assignments (server should return pending + history). Fallback to a simple single-assignment if offline.
     async function fetchAssignments(name, truck){
       try {
         const url = `https://script.google.com/macros/s/AKfycbzUy3d6QTbXcjh-kq0O8OsnKQGrMsQlE9CXSzfwiVbc19avtjsCPP3wA9hjd-CikNZJ/exec?mode=assignments&name=${encodeURIComponent(name)}&truck=${encodeURIComponent(truck)}`;
         const r = await fetch(url);
         if (r.ok){
           const json = await r.json();
-          if (Array.isArray(json.assignments)) return json.assignments; // expected shape from your backend
+          if (Array.isArray(json.assignments)) return json.assignments;
         }
-      } catch(e){ /* fall through */ }
-      // Fallback demo set: includes older items so a driver who's been away sees a lobby queue
+      } catch(e){ /* fallback below */ }
       return [
         { id:'eng-001', title: videoLinks.English.title, language:'English', source:{ type:'youtube', videoId: videoLinks.English.videoId }, status:'assigned', assignedAt: '2025-07-30' },
         { id:'swa-002', title: videoLinks.Swahili.title, language:'Swahili', source:{ type:'mp4', url: videoLinks.Swahili.url }, status:'assigned', assignedAt: '2025-08-01' },
@@ -170,7 +190,6 @@
       ];
     }
 
-    // 3) Create/Update row in sheet (start/complete). If offline, queue payload locally.
     async function postTrainingEvent(payload){
       try {
         const fd = new FormData(); Object.entries(payload).forEach(([k,v])=>fd.append(k, v));
@@ -216,6 +235,7 @@
       const historyEmpty  = $('historyEmpty');
       const changeDriverBtn=$('changeDriverBtn');
       const syncBtn       = $('syncBtn');
+      const sortBtn       = $('sortBtn');
 
       const videoSection  = $('videoSection');
       const completionSection = $('completionSection');
@@ -225,28 +245,54 @@
       const closeBtn      = $('closeBtn');
       const activeVideoTitle = $('activeVideoTitle');
 
-      // i18n
+      // i18n application across all screens
       function applyTranslations(lang){
         const t = translations[lang] || translations.English;
-        document.title = t.pageTitle;
+        document.documentElement.lang = t.code || 'en';
+        document.documentElement.dir  = t.dir || 'ltr';
+        $('langTitle').innerText = t.langTitle || 'Select Language';
+        document.title           = t.pageTitle;
+        $('continueBtn').innerText = t.continue;
         $('formTitle').innerText = t.formTitle;
         nameInput.placeholder    = t.name;
         truckInput.placeholder   = t.truck;
         submitBtn.innerText      = t.submit;
         backBtn.innerText        = t.back;
-        closeBtn.innerText       = t.cancel;
-        dashTitle.firstChild && (dashTitle.firstChild.nodeValue = t.dash + ' ');
+        dashTitle.textContent    = t.dash;
+        $('tabLobby').textContent   = t.lobby;
+        $('tabHistory').textContent = t.history;
+        $('syncBtn').textContent    = t.sync;
+        $('changeDriverBtn').textContent = t.change;
+        lobbyEmpty.textContent      = t.noPending;
+        historyEmpty.textContent    = t.noHistory;
+        if (sortBtn) sortBtn.textContent = `${t.sort}: ${lobbySort==='recent'?t.recent:t.oldest}`;
+        $('closeBtn').innerText  = t.cancel;
+        $('videoNote').innerText = t.loadingVideo;
+        $('completeBtn').innerText = t.complete;
       }
 
-      languageSelect.addEventListener('change', ()=>applyTranslations(languageSelect.value || 'English'));
+      // Initialize language from storage and set select
+      languageSelect.value = selectedLang;
+      applyTranslations(selectedLang);
+
+      languageSelect.addEventListener('change', ()=>{
+        selectedLang = languageSelect.value || 'English';
+        localStorage.setItem(LS_KEY_LANG, selectedLang);
+        applyTranslations(selectedLang);
+      });
 
       continueBtn.addEventListener('click', ()=>{
         if (!languageSelect.value){ alert('Please select a language.'); return; }
-        selectedLang = languageSelect.value; applyTranslations(selectedLang);
+        selectedLang = languageSelect.value; localStorage.setItem(LS_KEY_LANG, selectedLang);
+        applyTranslations(selectedLang);
         langSection.classList.remove('active'); checkinForm.classList.add('active');
       });
 
-      backBtn.addEventListener('click', ()=>{ checkinForm.reset(); languageSelect.value=''; selectedLang=''; applyTranslations('English'); checkinForm.classList.remove('active'); langSection.classList.add('active'); });
+      backBtn.addEventListener('click', ()=>{
+        checkinForm.reset(); languageSelect.value = selectedLang; // keep choice visible
+        applyTranslations(selectedLang);
+        checkinForm.classList.remove('active'); langSection.classList.add('active');
+      });
 
       nameInput.addEventListener('input', ()=>{ const match = driverList.find(d => d.name.toLowerCase() === nameInput.value.toLowerCase()); truckInput.value = match ? match.truck : ''; });
 
@@ -256,17 +302,15 @@
         submitBtn.disabled = true;
         driver = { name: nameInput.value.trim(), truck: truckInput.value.trim() };
 
-        // Load assignments for this driver
         let assignments = await fetchAssignments(driver.name, driver.truck);
 
-        // Show dashboard
-        driverBadge.textContent = `${driver.name} • ${driver.truck}`;
+        driverBadge.textContent = `${driver.name} • ${driver.truck}`; // RIGHT
+        applyTranslations(selectedLang); // ensure dashboard UI is localized
         renderDashboard(assignments);
         checkinForm.classList.remove('active'); dashboard.classList.add('active');
         submitBtn.disabled = false;
 
-        // Post a "Login / Start Session" row (optional)
-        try { await postTrainingEvent({ name: driver.name, truck: driver.truck, language: selectedLang, videoTitle: 'Dashboard Login', status: 'Session Start' }); } catch(e){ /* queued */ }
+        try { await postTrainingEvent({ name: driver.name, truck: driver.truck, language: selectedLang, videoTitle: (translations[selectedLang]||translations.English).dashboardLogin, status: 'Session Start' }); } catch(e){ /* queued */ }
       });
 
       function setActiveTab(tabName){
@@ -275,34 +319,45 @@
       }
       tabs.forEach(t=> t.addEventListener('click', ()=> setActiveTab(t.dataset.tab)));
 
-      changeDriverBtn.addEventListener('click', ()=>{ dashboard.classList.remove('active'); checkinForm.classList.add('active'); });
-      syncBtn.addEventListener('click', flushPending);
+      $('changeDriverBtn').addEventListener('click', ()=>{ dashboard.classList.remove('active'); checkinForm.classList.add('active'); applyTranslations(selectedLang); });
+      $('syncBtn').addEventListener('click', flushPending);
+      if (sortBtn) sortBtn.addEventListener('click', ()=>{
+        lobbySort = (lobbySort==='recent') ? 'oldest' : 'recent';
+        localStorage.setItem(LS_KEY_LOBBY_SORT, lobbySort);
+        applyTranslations(selectedLang);
+        renderDashboard(window.__assignments || []);
+      });
 
       function renderDashboard(assignments){
-        // Save a copy to state
         window.__assignments = assignments;
-        // Lobby: not completed
+        const t = translations[selectedLang] || translations.English;
         const pending = assignments.filter(a=>a.status !== 'completed');
+        // sort by assignedAt according to lobbySort
+        pending.sort((a,b)=>{
+          const da = Date.parse(a.assignedAt||'');
+          const db = Date.parse(b.assignedAt||'');
+          const va = isNaN(da) ? (lobbySort==='recent' ? -Infinity : Infinity) : da;
+          const vb = isNaN(db) ? (lobbySort==='recent' ? -Infinity : Infinity) : db;
+          return lobbySort==='recent' ? (vb - va) : (va - vb);
+        });
         lobbyList.innerHTML = '';
-        if (!pending.length){ lobbyEmpty.style.display='block'; } else { lobbyEmpty.style.display='none'; }
-        pending.forEach(a=> lobbyList.appendChild(makeAssignmentCard(a, true)));
+        lobbyEmpty.style.display = pending.length ? 'none' : 'block';
+        pending.forEach(a=> lobbyList.appendChild(makeAssignmentCard(a, true, t)));
 
-        // History: completed
         const done = assignments.filter(a=>a.status === 'completed');
         historyList.innerHTML = '';
-        if (!done.length){ historyEmpty.style.display='block'; } else { historyEmpty.style.display='none'; }
-        done.forEach(a=> historyList.appendChild(makeAssignmentCard(a, false)));
+        historyEmpty.style.display = done.length ? 'none' : 'block';
+        done.forEach(a=> historyList.appendChild(makeAssignmentCard(a, false, t)));
       }
 
-      function makeAssignmentCard(a, withPlay){
+      function makeAssignmentCard(a, withPlay, t){
         const card = document.createElement('div'); card.className = 'card';
-        const when  = a.status==='completed' ? (a.completedAt? ` • ${a.completedAt}`: '') : (a.assignedAt? ` • Assigned ${a.assignedAt}`: '');
-        card.innerHTML = `<div style="font-weight:700">${a.title}<span class="pill">${a.language}</span></div><div style="font-size:13px;color:#374151;margin:6px 0 10px">Status: ${a.status}${when}</div>`;
+        const when  = a.status==='completed' ? (a.completedAt? ` • ${a.completedAt}`: '') : (a.assignedAt? ` • ${t.assigned} ${a.assignedAt}`: '');
+        card.innerHTML = `<div style="font-weight:700">${a.title}<span class=\"pill\">${a.language}</span></div><div style=\"font-size:13px;color:#374151;margin:6px 0 10px\">${t.status}: ${a.status}${when}</div>`;
         if (withPlay){
-          const btn = document.createElement('button'); btn.textContent = 'Play';
-          btn.addEventListener('click', ()=> startAssignment(a)); card.appendChild(btn);
+          const btn = document.createElement('button'); btn.textContent = t.play; btn.addEventListener('click', ()=> startAssignment(a)); card.appendChild(btn);
         } else if (a.duration) {
-          const note = document.createElement('div'); note.style.fontSize='12px'; note.style.color='#6b7280'; note.textContent = `Duration: ${a.duration}`; card.appendChild(note);
+          const note = document.createElement('div'); note.style.fontSize='12px'; note.style.color='#6b7280'; note.textContent = `${t.duration}: ${a.duration}`; card.appendChild(note);
         }
         return card;
       }
@@ -310,22 +365,19 @@
       async function startAssignment(a){
         currentAssignment = a; maxAllowedTime = 0; watchedSeconds = 0; minReached = false;
         selectedLang = a.language || selectedLang || 'English';
-        const t = translations[selectedLang] || translations.English;
-        $('completeBtn').innerText = t.complete; $('closeBtn').innerText = t.cancel; $('dashTitle').firstChild && ($('dashTitle').firstChild.nodeValue = t.dash + ' ');
+        localStorage.setItem(LS_KEY_LANG, selectedLang);
+        applyTranslations(selectedLang);
 
-        // Record Course Started (one row per driver session per video)
         startTime = new Date();
         const payload = { name: driver.name, truck: driver.truck, language: selectedLang, videoTitle: a.title, status: 'Course Started', assignmentId: a.id };
         try { const res = await postTrainingEvent(payload); rowId = res.row; } catch(e){ /* queued */ }
 
-        // Show video section
         $('dashboardSection').classList.remove('active');
         $('videoSection').classList.add('active');
 
         activeVideoTitle.textContent = a.title;
-        const catalog = videoLinks[selectedLang] || {};
-        const noteTxt = (catalog && catalog.note) ? catalog.note : 'Please watch the full video. The completion button appears after 40 seconds watched, or near the end. Seeking is disabled.';
-        videoNote.innerText = noteTxt;
+        const catalog = translations[selectedLang];
+        $('videoNote').innerText = (videoLinks[selectedLang] && videoLinks[selectedLang].note) ? videoLinks[selectedLang].note : (catalog ? catalog.loadingVideo : 'Loading video...');
         $('completionSection').style.display = 'none';
         videoContainer.innerHTML = '';
 
@@ -359,7 +411,7 @@
       }
 
       function onYTReady(event){
-        try { event.target.setPlaybackRate(1); } catch(_){}
+        try { event.target.setPlaybackRate(1); } catch(_){ }
         event.target.playVideo();
         clearInterval(progressPoll);
         progressPoll = setInterval(()=>{
@@ -370,7 +422,7 @@
           watchedSeconds = Math.max(watchedSeconds, Math.floor(maxAllowedTime));
           if (!minReached && watchedSeconds >= MIN_WATCH_SECONDS) { minReached = true; $('completionSection').style.display = 'block'; }
           if (dur && (dur - ct) <= REVEAL_BEFORE_END) $('completionSection').style.display = 'block';
-          try { if (ytPlayer.getPlaybackRate && ytPlayer.getPlaybackRate() !== 1) ytPlayer.setPlaybackRate(1); } catch(_){}
+          try { if (ytPlayer.getPlaybackRate && ytPlayer.getPlaybackRate() !== 1) ytPlayer.setPlaybackRate(1); } catch(_){ }
         }, 500);
       }
 
@@ -386,27 +438,20 @@
         $('completionSection').innerHTML = `<h3>${(translations[selectedLang]||translations.English).complete}</h3>`;
         videoContainer.innerHTML = '';
 
-        // Update local list so dashboard reflects completion without reload
         if (window.__assignments && currentAssignment){
           const idx = window.__assignments.findIndex(x=>x.id===currentAssignment.id);
           if (idx>-1){ window.__assignments[idx].status='completed'; window.__assignments[idx].completedAt = new Date().toISOString().slice(0,10); window.__assignments[idx].duration = `${durationMin} minutes`; }
         }
-        // After short delay, return to dashboard and re-render
-        setTimeout(()=>{ $('videoSection').classList.remove('active'); $('dashboardSection').classList.add('active'); $('completionSection').style.display='none'; $('completionSection').innerHTML = '<button id="completeBtn">Mark Complete</button>'; renderDashboard(window.__assignments||[]); }, 1200);
+        setTimeout(()=>{ $('videoSection').classList.remove('active'); $('dashboardSection').classList.add('active'); $('completionSection').style.display='none'; $('completionSection').innerHTML = '<button id="completeBtn">Mark Complete</button>'; renderDashboard(window.__assignments||[]); applyTranslations(selectedLang); }, 1200);
 
         if (!ok) toast('Saved offline. Will sync when you tap "Sync Pending".');
       }
 
       $('completeBtn').addEventListener('click', submitCompletion);
-      closeBtn.addEventListener('click', ()=>{ // Cancel video, return to dashboard
-        clearInterval(progressPoll);
-        if (ytPlayer) { try { ytPlayer.destroy(); } catch(e){} ytPlayer = null; }
-        $('videoSection').classList.remove('active'); $('dashboardSection').classList.add('active');
-        $('completionSection').style.display='none'; videoContainer.innerHTML='';
-      });
+      closeBtn.addEventListener('click', ()=>{ clearInterval(progressPoll); if (ytPlayer) { try { ytPlayer.destroy(); } catch(e){} ytPlayer = null; } $('videoSection').classList.remove('active'); $('dashboardSection').classList.add('active'); $('completionSection').style.display='none'; videoContainer.innerHTML=''; applyTranslations(selectedLang); });
 
-      // Init i18n
-      applyTranslations('English');
+      // Ensure UI starts in the stored language on first paint
+      applyTranslations(selectedLang);
     });
   </script>
 </body>
