@@ -46,6 +46,21 @@
     .tab { padding:10px 14px; border-radius: 999px; background:#e5e7eb; cursor:pointer; user-select:none; white-space:nowrap; }
     .tab.active { background:var(--brand); color:#fff; }
 
+    /* === Visibility improvements (added previously) === */
+    #lobbyEmpty, #historyEmpty {
+      background: rgba(255, 255, 255, 0.95);
+      color: #222;
+      padding: 12px 16px;
+      border-radius: 10px;
+      font-weight: 500;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.12);
+      display: inline-block;
+      margin-top: 20px;
+    }
+    .tabs .tab { background: rgba(255, 255, 255, 0.9); color: #111; font-weight: 600; }
+    .tabs .tab.active { background: var(--brand); color: #fff; }
+    /* === End visibility improvements === */
+
     /* DASH BAR */
     .dashbar{ display:flex; align-items:center; justify-content:space-between; gap:12px; margin-bottom:16px; }
     .driver-badge{ font-weight:600; font-size:14px; background:#111827; color:#fff; padding:8px 12px; border-radius:999px; box-shadow: var(--title-shadow); white-space:nowrap; }
@@ -62,17 +77,10 @@
       body::before{ background: rgba(255,255,255,0.92); }
 
       .dashbar{ flex-wrap: wrap; gap: 8px; }
-      /* Hide desktop-only controls on phones */
       #syncBtn, #changeDriverBtn{ display: none !important; }
-
-      /* Make cards/tabs neat on small screens */
       .card{ min-width: auto; flex: 1 1 100%; }
       .driver-badge{ font-size: 12px; }
-
-      /* Tuck the completion button to a corner on phones */
       #completionSection{ right: 12px; left: auto; bottom: 12px; transform: none; }
-
-      /* Larger touch targets */
       button{ padding: 14px; }
     }
   </style>
@@ -217,10 +225,10 @@
     }
     function saveDriverState(state){ localStorage.setItem(driverStateKey(), JSON.stringify(state||{})); }
 
-    function markWatched(assignmentId){
+    function markWatched(assignmentId, extra={}){
       const st = loadDriverState();
       st.watched = st.watched || {};
-      st.watched[assignmentId] = true;
+      st.watched[assignmentId] = { done:true, ...extra };
       saveDriverState(st);
     }
 
@@ -245,6 +253,7 @@
     function enqueuePending(payload){ const list = pendingCompletions(); list.push(payload); savePendingCompletions(list); }
 
     // === Data I/O ===
+
     async function loadDrivers() {
       try {
         const res = await fetch('https://script.google.com/macros/s/AKfycbyUqJCIYWHwTZeAeOCkUDAt3kHvEgoAZj4X8kOJtqu9gL24gUBSQHwzlQ6jqfpeHxJQOA/exec');
@@ -277,6 +286,20 @@
       return all;
     }
 
+    /* Cloud history sync: pull completed items from server */
+    async function fetchHistory(name, truck){
+      try{
+        const url = `https://script.google.com/macros/s/AKfycbzUy3d6QTbXcjh-kq0O8OsnKQGrMsQlE9CXSzfwiVbc19avtjsCPP3wA9hjd-CikNZJ/exec?mode=history&name=${encodeURIComponent(name)}&truck=${encodeURIComponent(truck)}`;
+        const r = await fetch(url);
+        if (!r.ok) throw new Error('net');
+        const json = await r.json();
+        // Expected: { history: [{assignmentId, language, title, completedAt, duration}] }
+        return Array.isArray(json.history) ? json.history : [];
+      }catch(e){
+        return []; // offline or server not ready
+      }
+    }
+
     async function postTrainingEvent(payload){
       try {
         const fd = new FormData(); Object.entries(payload).forEach(([k,v])=>fd.append(k, v));
@@ -301,7 +324,7 @@
     document.addEventListener('DOMContentLoaded', function(){
       loadDrivers();
 
-      // Refs (declare BEFORE any function uses them)
+      // Refs
       const langSection   = $('languageSection');
       const checkinForm   = $('checkinForm');
       const dashboard     = $('dashboardSection');
@@ -314,8 +337,6 @@
       const dashTitle     = $('dashTitle');
       const driverBadge   = $('driverBadge');
       const tabs          = document.querySelectorAll('.tab');
-      const lobbyPane     = $('lobby');
-      const historyPane   = $('history');
       const lobbyList     = $('lobbyList');
       const historyList   = $('historyList');
       const lobbyEmpty    = $('lobbyEmpty');
@@ -332,16 +353,14 @@
       const closeBtn      = $('closeBtn');
       const activeVideoTitle = $('activeVideoTitle');
 
-      // Build language options dynamically (built-in + custom)
       function populateLanguageSelect(){
         const tmap = getTranslations();
         const opts = Object.keys(tmap);
         languageSelect.innerHTML = '<option value="">-- Choose a Language --</option>' + opts.map(o=>`<option value="${o}">${o}</option>`).join('');
         languageSelect.value = selectedLang;
       }
-      window.populateLanguageSelect = populateLanguageSelect; // expose for addLanguage()
+      window.populateLanguageSelect = populateLanguageSelect;
 
-      // i18n application across all screens
       function tFor(lang){ const map = getTranslations(); return map[lang] || map.English; }
       function applyTranslations(lang){
         const t = tFor(lang);
@@ -368,7 +387,6 @@
         $('completeBtn').innerText = t.complete;
       }
 
-      // Populate select and apply i18n AFTER refs exist
       populateLanguageSelect();
       languageSelect.value = selectedLang;
       applyTranslations(selectedLang);
@@ -377,6 +395,8 @@
         selectedLang = languageSelect.value || 'English';
         localStorage.setItem(LS_KEY_LANG, selectedLang);
         applyTranslations(selectedLang);
+        // Re-render using same assignments if already loaded
+        if (window.__assignments) renderDashboard(window.__assignments);
       });
 
       continueBtn.addEventListener('click', ()=>{
@@ -387,7 +407,7 @@
       });
 
       backBtn.addEventListener('click', ()=>{
-        checkinForm.reset(); languageSelect.value = selectedLang; // keep choice visible
+        checkinForm.reset(); languageSelect.value = selectedLang;
         applyTranslations(selectedLang);
         checkinForm.classList.remove('active'); langSection.classList.add('active');
       });
@@ -400,14 +420,24 @@
         submitBtn.disabled = true;
         driver = { name: nameInput.value.trim(), truck: truckInput.value.trim() };
 
-        let assignments = await fetchAssignments(driver.name, driver.truck);
-
-        // Persist preferred language per driver
+        // Persist preferred language per driver (local)
         const st0 = loadDriverState(); st0.lang = selectedLang; saveDriverState(st0);
 
-        driverBadge.textContent = `${driver.name} • ${driver.truck}`; // RIGHT
-        applyTranslations(selectedLang); // ensure dashboard UI is localized
+        driverBadge.textContent = `${driver.name} • ${driver.truck}`;
+        applyTranslations(selectedLang);
+
+        // 1) Load assignments
+        let assignments = await fetchAssignments(driver.name, driver.truck);
+
+        // 2) Pull server history and merge into assignments + local state
+        const history = await fetchHistory(driver.name, driver.truck);
+        assignments = mergeServerHistory(assignments, history);  // <-- ensures completed items show in History
+        hydrateLocalWatchedFromServer(history);                  // <-- keep local cache aligned for offline use
+
+        // Save & render
+        window.__assignments = assignments;
         renderDashboard(assignments);
+
         checkinForm.classList.remove('active'); dashboard.classList.add('active');
         submitBtn.disabled = false;
 
@@ -429,17 +459,66 @@
         renderDashboard(window.__assignments || []);
       });
 
+      /* Merge server history: aligns assignments with cloud-completed items */
+      function mergeServerHistory(assignments, hist){
+        const byId = new Map(assignments.map(a=>[a.id,a]));
+        // Mark completed ones
+        hist.forEach(h=>{
+          const a = byId.get(h.assignmentId);
+          if (a){
+            a.status = 'completed';
+            a.completedAt = h.completedAt || a.completedAt || new Date().toISOString().slice(0,10);
+            a.duration = h.duration || a.duration;
+            a.language = h.language || a.language;
+          } else {
+            // History may include a video not in current assignment feed; add it so it shows under History
+            byId.set(h.assignmentId, {
+              id: h.assignmentId,
+              title: h.title || 'Completed Training',
+              language: h.language || selectedLang,
+              source: null, // unknown here; not needed for history display
+              status: 'completed',
+              completedAt: h.completedAt || new Date().toISOString().slice(0,10),
+              duration: h.duration
+            });
+          }
+        });
+        return Array.from(byId.values());
+      }
+
+      /* Cache server-completed items in local driver state for offline */
+      function hydrateLocalWatchedFromServer(hist){
+        if (!hist || !hist.length) return;
+        const st = loadDriverState();
+        st.watched = st.watched || {};
+        hist.forEach(h=>{
+          st.watched[h.assignmentId] = {
+            done:true,
+            completedAt: h.completedAt || new Date().toISOString().slice(0,10),
+            duration: h.duration,
+            language: h.language
+          };
+        });
+        saveDriverState(st);
+      }
+
       function renderDashboard(assignments){
         window.__assignments = assignments;
         const t = tFor(selectedLang);
         const st = loadDriverState();
         const watched = st.watched || {};
 
-        // Filter by selected language only
+        // Filter by selected language only (Netflix-style per language)
         const inLang = assignments.filter(a=> (a.language||selectedLang) === selectedLang);
 
-        // Recompute statuses from driver state
-        inLang.forEach(a=>{ if (watched[a.id]) { a.status = 'completed'; if (!a.completedAt) a.completedAt = new Date().toISOString().slice(0,10); } });
+        // Recompute statuses from local state (already hydrated from server)
+        inLang.forEach(a=>{
+          if (watched[a.id]?.done) {
+            a.status = 'completed';
+            a.completedAt = a.completedAt || watched[a.id].completedAt;
+            a.duration = a.duration || watched[a.id].duration;
+          }
+        });
 
         // Pending (unwatched)
         const pending = inLang.filter(a=>a.status !== 'completed');
@@ -456,6 +535,8 @@
 
         // History (watched)
         const done = inLang.filter(a=>a.status === 'completed');
+        // Keep history sorted by completion date (newest first)
+        done.sort((a,b)=> Date.parse(b.completedAt||0) - Date.parse(a.completedAt||0));
         historyList.innerHTML = '';
         historyEmpty.style.display = done.length ? 'none' : 'block';
         done.forEach(a=> historyList.appendChild(makeAssignmentCard(a, false, t)));
@@ -463,8 +544,10 @@
 
       function makeAssignmentCard(a, withPlay, t){
         const card = document.createElement('div'); card.className = 'card';
-        const when  = a.status==='completed' ? (a.completedAt? ` • ${a.completedAt}`: '') : (a.assignedAt? ` • ${t.assigned} ${a.assignedAt}`: '');
-        card.innerHTML = `<div style="font-weight:700">${a.title}<span class=\"pill\">${a.language}</span></div><div style=\"font-size:13px;color:#374151;margin:6px 0 10px\">${t.status}: ${a.status}${when}</div>`;
+        const when  = a.status==='completed'
+          ? (a.completedAt? ` • ${a.completedAt}`: '')
+          : (a.assignedAt? ` • ${t.assigned} ${a.assignedAt}`: '');
+        card.innerHTML = `<div style="font-weight:700">${a.title}<span class="pill">${a.language}</span></div><div style="font-size:13px;color:#374151;margin:6px 0 10px">${t.status}: ${a.status}${when}</div>`;
         if (withPlay){
           const btn = document.createElement('button'); btn.textContent = t.play; btn.addEventListener('click', ()=> startAssignment(a)); card.appendChild(btn);
         } else if (a.duration) {
@@ -548,29 +631,63 @@
 
       async function submitCompletion(){
         const end = new Date(); const ms = end - startTime; const durationMin = Math.max(1, Math.round(ms/60000));
-        const payload = { name: driver.name, truck: driver.truck, videoTitle: currentAssignment?.title || 'Unknown', status:'Completed', duration: `${durationMin} minutes`, rowId, assignmentId: currentAssignment?.id };
+        const payload = {
+          name: driver.name,
+          truck: driver.truck,
+          videoTitle: currentAssignment?.title || 'Unknown',
+          status:'Completed',
+          duration: `${durationMin} minutes`,
+          rowId,
+          assignmentId: currentAssignment?.id,
+          language: selectedLang
+        };
         let ok = true;
         try { await postTrainingEvent(payload); } catch(e){ ok = false; }
-        $('completionSection').innerHTML = `<h3>${tFor(selectedLang).complete}</h3>`;
-        videoContainer.innerHTML = '';
 
-        // Persist watched
-        if (currentAssignment?.id) markWatched(currentAssignment.id);
+        // Persist watched locally (with details)
+        if (currentAssignment?.id) markWatched(currentAssignment.id, {
+          completedAt: new Date().toISOString().slice(0,10),
+          duration: `${durationMin} minutes`,
+          language: selectedLang
+        });
 
-        // Update in-memory list
+        // Update cached assignments
         if (window.__assignments && currentAssignment){
           const idx = window.__assignments.findIndex(x=>x.id===currentAssignment.id);
-          if (idx>-1){ window.__assignments[idx].status='completed'; window.__assignments[idx].completedAt = new Date().toISOString().slice(0,10); window.__assignments[idx].duration = `${durationMin} minutes`; }
+          if (idx>-1){
+            window.__assignments[idx].status='completed';
+            window.__assignments[idx].completedAt = new Date().toISOString().slice(0,10);
+            window.__assignments[idx].duration = `${durationMin} minutes`;
+            window.__assignments[idx].language = selectedLang;
+          }
         }
-        setTimeout(()=>{ $('videoSection').classList.remove('active'); $('dashboardSection').classList.add('active'); $('completionSection').style.display='none'; $('completionSection').innerHTML = '<button id="completeBtn">Mark Complete</button>'; renderDashboard(window.__assignments||[]); applyTranslations(selectedLang); }, 1200);
+
+        $('completionSection').innerHTML = `<h3>${tFor(selectedLang).complete}</h3>`;
+        videoContainer.innerHTML = '';
+        setTimeout(()=>{
+          $('videoSection').classList.remove('active');
+          $('dashboardSection').classList.add('active');
+          $('completionSection').style.display='none';
+          $('completionSection').innerHTML = '<button id="completeBtn">Mark Complete</button>';
+          renderDashboard(window.__assignments||[]);
+          applyTranslations(selectedLang);
+        }, 1200);
 
         if (!ok) toast('Saved offline. Will sync when you tap "Sync Pending".');
       }
 
       $('completeBtn').addEventListener('click', submitCompletion);
-      closeBtn.addEventListener('click', ()=>{ clearInterval(progressPoll); if (ytPlayer) { try { ytPlayer.destroy(); } catch(e){} ytPlayer = null; } $('videoSection').classList.remove('active'); $('dashboardSection').classList.add('active'); $('completionSection').style.display='none'; videoContainer.innerHTML=''; applyTranslations(selectedLang); });
+      closeBtn.addEventListener('click', ()=>{
+        clearInterval(progressPoll);
+        if (ytPlayer) { try { ytPlayer.destroy(); } catch(e){} ytPlayer = null; }
+        $('videoSection').classList.remove('active');
+        $('dashboardSection').classList.add('active');
+        $('completionSection').style.display='none';
+        videoContainer.innerHTML='';
+        applyTranslations(selectedLang);
+      });
 
-      // === Lightweight self-tests (open with ?test=1) ===
+      // Self-tests (optional)
       function runSelfTests(){
         const results = [];
         try { results.push({ test:'languageSelect exists', ok: !!languageSelect }); } catch(e){ results.push({ test:'languageSelect exists', ok:false, error:e.message }); }
@@ -585,7 +702,6 @@
       }
       if (new URLSearchParams(location.search).get('test') === '1') runSelfTests();
 
-      // Ensure UI starts in the stored language on first paint
       applyTranslations(selectedLang);
     });
   </script>
