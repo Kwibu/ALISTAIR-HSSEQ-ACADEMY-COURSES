@@ -204,13 +204,7 @@
     function savePendingCompletions(list){ localStorage.setItem(LS_KEY_PENDING_COMPLETIONS, JSON.stringify(list)); }
     function enqueuePending(payload){ const list=pendingCompletions(); list.push(payload); savePendingCompletions(list); }
 
-    // Re-bind "Mark Complete" button whenever it's recreated
-    function bindCompleteBtn(){
-      const btn = document.getElementById('completeBtn');
-      if (btn) btn.onclick = submitCompletion;
-    }
-
-    // ===== Data I/O (to your Apps Script) =====
+    // ===== Data I/O (all to the same Apps Script) =====
     async function loadDrivers() {
       try {
         const res = await fetch(`${BASE_URL}?mode=drivers`, { cache: 'no-store' });
@@ -218,7 +212,6 @@
         const data = await res.json();
         const dl = $('driverNames');
         dl.innerHTML = '';
-        driverList.length = 0;
         data.forEach(d => { driverList.push(d); const opt = document.createElement('option'); opt.value = d.name; dl.appendChild(opt); });
       } catch (e) {
         console.error('Driver fetch failed:', e);
@@ -331,7 +324,6 @@
       populateLanguageSelect();
       languageSelect.value = selectedLang;
       applyTranslations(selectedLang);
-      bindCompleteBtn();
 
       languageSelect.addEventListener('change', ()=>{
         selectedLang = languageSelect.value || 'English';
@@ -380,7 +372,6 @@
 
         checkinForm.classList.remove('active'); dashboard.classList.add('active');
         submitBtn.disabled = false;
-      }); // ← correctly closed
 
       function setActiveTab(tabName){
         document.querySelectorAll('.tab').forEach(el=>el.classList.toggle('active', el.dataset.tab===tabName));
@@ -582,7 +573,6 @@
           $('dashboardSection').classList.add('active');
           $('completionSection').style.display='none';
           $('completionSection').innerHTML = '<button id="completeBtn">Mark Complete</button>';
-          bindCompleteBtn(); // rebind after recreating the button
           renderDashboard(window.__assignments||[]);
           applyTranslations(selectedLang);
         }, 1200);
@@ -590,6 +580,7 @@
         if (!ok) toast('Saved offline. Will sync when you tap "Sync Pending".');
       }
 
+      $('completeBtn').addEventListener('click', submitCompletion);
       closeBtn.addEventListener('click', ()=>{
         clearInterval(progressPoll);
         if (ytPlayer) { try { ytPlayer.destroy(); } catch(e){} ytPlayer = null; }
@@ -604,4 +595,4 @@
     });
   </script>
 </body>
-</html>
+</html
