@@ -1743,43 +1743,51 @@
       }
       
       applyTranslations(lang) {
-        const t = this.getTranslations()[lang] || TRANSLATIONS.English;
-        
-        // Set document language and direction
-        document.documentElement.lang = t.code || 'en';
-        document.documentElement.dir = t.dir || 'ltr';
-        
-        // Update page title
-        document.title = t.pageTitle;
-        
-        // Language selection
-        $('#langTitle').textContent = t.langTitle;
-        const emptyOpt = $('#languageSelect').querySelector('option[value=""]');
-        if (emptyOpt) emptyOpt.textContent = t.choose;
-        
-        // Check-in form
-        $('#formTitle').textContent = t.formTitle;
-        $('#name').placeholder = t.name;
-        $('#truck').placeholder = t.truck;
-        $('#submitBtn').textContent = t.submit;
-        $('#backBtn').textContent = t.back;
-        
-        // Dashboard
-        $('#dashTitle').textContent = t.dash;
-        $('#tabLobby').textContent = t.lobby;
-        $('#tabHistory').textContent = t.history;
-        $('#syncBtn').textContent = t.sync;
-        $('#changeDriverBtn').textContent = t.change;
-        $('#lobbyEmpty').textContent = t.noPending;
-        $('#historyEmpty').textContent = t.noHistory;
-        
-        // Video player
-        $('#closeBtn').textContent = t.cancel;
-        const completeBtn = $('#completeBtn'); if (completeBtn) completeBtn.textContent = t.complete;
-        
-        // Update sort button
-        $('#sortBtn').textContent = `${t.sort}: ${this.lobbySort === 'recent' ? t.recent : t.oldest}`;
-      }
+  const t = this.getTranslations()[lang] || TRANSLATIONS.English;
+
+  // Set document language and direction
+  document.documentElement.lang = t.code || 'en';
+  document.documentElement.dir = t.dir || 'ltr';
+
+  // Update page title
+  document.title = t.pageTitle;
+
+  // Language selection
+  $('#langTitle').textContent = t.langTitle;
+  const emptyOpt = $('#languageSelect').querySelector('option[value=""]');
+  if (emptyOpt) emptyOpt.textContent = t.choose;
+
+  // ✅ translate language screen buttons
+  const contBtn = $('#continueBtn');
+  if (contBtn) contBtn.textContent = t.continue; // e.g. "Endelea" in Swahili
+
+  const adminBtn = $('#adminLoginBtn');
+  if (adminBtn) adminBtn.textContent = t.dashboardLogin || 'Admin Login';
+
+  // Check-in form
+  $('#formTitle').textContent = t.formTitle;
+  $('#name').placeholder = t.name;
+  $('#truck').placeholder = t.truck;
+  $('#submitBtn').textContent = t.submit;
+  $('#backBtn').textContent = t.back;
+
+  // Dashboard
+  $('#dashTitle').textContent = t.dash;
+  $('#tabLobby').textContent = t.lobby;
+  $('#tabHistory').textContent = t.history;
+  $('#syncBtn').textContent = t.sync;
+  $('#changeDriverBtn').textContent = t.change;
+  $('#lobbyEmpty').textContent = t.noPending;
+  $('#historyEmpty').textContent = t.noHistory;
+
+  // Video player
+  $('#closeBtn').textContent = t.cancel;
+  const completeBtn = $('#completeBtn');
+  if (completeBtn) completeBtn.textContent = t.complete;
+
+  // Sort button
+  $('#sortBtn').textContent = `${t.sort}: ${this.lobbySort === 'recent' ? t.recent : t.oldest}`;
+}
       
       renderDashboard(assignments) {
         this.assignments = assignments;
@@ -2440,3 +2448,4 @@
   </script>
 </body>
 </html>
+
