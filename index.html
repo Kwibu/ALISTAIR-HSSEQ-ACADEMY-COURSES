@@ -2258,20 +2258,7 @@ if (adminBtn) adminBtn.textContent = t.adminLogin || 'Admin Login';
       
       getVideoLinks() {
         const custom = this.loadCustomLangs();
-        const links = JSON.parse(JSON.stringify({
-          English: [
-            { id: 'eng-001', type: 'youtube', videoId: 'fVl88Q5DJ2w', title: 'Driver Tiredness, Fatigue and Road Safety' }
-          ],
-          Swahili: [
-            { id: 'swa-002', type: 'mp4', url: 'https://example.com/swahili-safety.mp4', title: 'Kampeni ya Usalama kwa Madereva' }
-          ],
-          Bemba: [
-            { id: 'bem-003', type: 'mp4', url: 'https://example.com/bemba-safety.mp4', title: 'Kampeni ya Ukusalama kwa Abapashi' }
-          ],
-          Portuguese: [
-            { id: 'por-004', type: 'mp4', url: 'https://example.com/portuguese-safety.mp4', title: 'Campanha de Segurança para Motoristas' }
-          ]
-        }));
+       const links = {};
         
         Object.entries(custom).forEach(([lang, data]) => {
           if (data.videos && Array.isArray(data.videos)) {
@@ -2460,6 +2447,7 @@ if (adminBtn) adminBtn.textContent = t.adminLogin || 'Admin Login';
   </script>
 </body>
 </html>
+
 
 
 
