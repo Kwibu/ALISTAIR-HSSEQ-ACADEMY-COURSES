@@ -4,11 +4,7 @@
   <meta charset="UTF-8" />
   <title>Driver Training Portal</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-
-  <!-- Fonts (faster) -->
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-
   <style>
     :root {
       --primary: #2563eb;
@@ -36,16 +32,17 @@
       font-size: 16px; line-height: 1.5; color: var(--dark);
       background-color: #f1f5f9;
       background-image: url('trucks.jpg');
-      background-size: cover; background-position: center;
-      /* faster on phones than 'fixed' */
-      background-attachment: scroll;
+      background-size: cover; background-position: center; background-attachment: fixed;
     }
+    /* Improve scroll performance on phones/tablets */
+    @media (max-width: 1024px) { html, body { background-attachment: scroll; } }
+
     body::before { content: ""; position: fixed; inset: 0; background: rgba(255,255,255,0.92); z-index: -1; }
     #app { min-height: 100%; display: flex; flex-direction: column; }
     .container { width: 100%; max-width: 1200px; margin: 0 auto; padding: 1rem; }
 
     /* Sections */
-    .section { display: none; flex: 1; padding: 1.5rem 0; }
+    .section { display: none; flex: 1; padding: 1.5rem 0; content-visibility: auto; contain-intrinsic-size: 800px; }
     .section.active { display: block; animation: fadeIn 0.3s ease; }
     @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
@@ -63,15 +60,14 @@
     .text-sm { font-size: 0.875rem; }
     .text-center { text-align: center; }
 
-    /* Paper-like chip for titles */
-    .paper-title{
+    /* Paper-style title chip */
+    .paper-title {
       display: inline-block;
-      background-color: rgba(255, 255, 255, 0.95);
+      background-color: rgba(255,255,255,0.96);
       padding: 0.5rem 0.75rem;
       border-radius: var(--radius-md);
       border: 1px solid var(--border);
       box-shadow: var(--shadow-sm);
-      margin: 0;
     }
 
     /* Buttons */
@@ -380,7 +376,7 @@
     const $$ = (sel, root = document) => Array.from(root.querySelectorAll(sel));
   </script>
 
-  <!-- Removed global YouTube API tag. We lazy-load it when needed. -->
+  <!-- (Lazy-loaded when needed) YouTube API: removed the eager script tag -->
 
   <script>
     // ======= CONFIGURATION =======
@@ -444,8 +440,7 @@
         noPending: 'No pending trainings. Great job!', noHistory: 'No completed trainings yet.',
         loadingVideo: 'Preparing training...', adminLogin: 'Admin Login',
         sort: 'Sort', recent: 'Recent', oldest: 'Oldest', alertSelectLang: 'Please select a language.',
-        alertFillAll: 'Please fill in all fields.', localOnly: 'Local Only',
-        delete: 'Delete'
+        alertFillAll: 'Please fill in all fields.', localOnly: 'Local Only'
       },
       Swahili: {
         code: 'sw', dir: 'ltr',
@@ -462,8 +457,7 @@
         loadingVideo: 'Inapakia mafunzo...', adminLogin: 'Ingia kwa Admin',
         sort: 'Panga', recent: 'Za Hivi Karibuni', oldest: 'Za Zamani',
         alertSelectLang: 'Tafadhali chagua lugha.', alertFillAll: 'Tafadhali jaza sehemu zote.',
-        localOnly: 'Ya Ndani Tu',
-        delete: 'Futa'
+        localOnly: 'Ya Ndani Tu'
       },
       Bemba: {
         code: 'bem', dir: 'ltr',
@@ -478,8 +472,7 @@
         loadingVideo: 'Ukupakila ifyakusambilila...', adminLogin: 'Admin Login',
         sort: 'Teekanya', recent: 'Ifyapya', oldest: 'Ifyakale',
         alertSelectLang: 'Sankeni ululimi.', alertFillAll: 'Sambilileni ifyose.',
-        localOnly: 'Ya Konse Konse',
-        delete: 'Delete'
+        localOnly: 'Ya Konse Konse'
       },
       Portuguese: {
         code: 'pt', dir: 'ltr',
@@ -494,16 +487,35 @@
         loadingVideo: 'Preparando treinamento...', adminLogin: 'Login do Administrador',
         sort: 'Ordenar', recent: 'Mais recentes', oldest: 'Mais antigas',
         alertSelectLang: 'Selecione um idioma.', alertFillAll: 'Preencha todos os campos.',
-        localOnly: 'Apenas Local',
-        delete: 'Eliminar'
+        localOnly: 'Apenas Local'
       }
     };
+
+    /* -------- Lazy-load YouTube IFrame API when needed -------- */
+    function ensureYouTubeAPI() {
+      return new Promise((resolve) => {
+        if (window.YT && window.YT.Player) return resolve();
+        if (window._ytLoading) { window._ytLoading.push(resolve); return; }
+        window._ytLoading = [resolve];
+        const s = document.createElement('script');
+        s.src = 'https://www.youtube.com/iframe_api';
+        s.async = true;
+        document.head.appendChild(s);
+        const prev = window.onYouTubeIframeAPIReady;
+        window.onYouTubeIframeAPIReady = () => {
+          const waiters = window._ytLoading || [];
+          waiters.forEach(fn => fn());
+          window._ytLoading = null;
+          if (typeof prev === 'function') prev();
+        };
+      });
+    }
 
     // ====== CORE FUNCTIONALITY ======
     class DriverTrainingApp {
       constructor() {
         // State
-        this.selectedLang = ((localStorage.getItem(CONFIG.STORAGE_KEYS.LANGUAGE) || 'English') + '').trim();
+        this.selectedLang = localStorage.getItem(CONFIG.STORAGE_KEYS.LANGUAGE) || 'English';
         this.lobbySort = localStorage.getItem(CONFIG.STORAGE_KEYS.SORT_PREFERENCE) || 'recent';
         this.driver = { name: '', truck: '' };
         this.driverList = [];
@@ -579,7 +591,7 @@
       initEventListeners() {
         // Language selection
         $('#languageSelect').addEventListener('change', () => {
-          this.selectedLang = (($('#languageSelect').value || 'English') + '').trim();
+          this.selectedLang = $('#languageSelect').value || 'English';
           localStorage.setItem(CONFIG.STORAGE_KEYS.LANGUAGE, this.selectedLang);
           this.applyTranslations(this.selectedLang);
           if (this.assignments.length) this.renderDashboard(this.assignments);
@@ -592,7 +604,7 @@
             this.showToast(t.alertSelectLang || 'Please select a language.');
             return;
           }
-          this.selectedLang = (($('#languageSelect').value || 'English') + '').trim();
+          this.selectedLang = $('#languageSelect').value;
           localStorage.setItem(CONFIG.STORAGE_KEYS.LANGUAGE, this.selectedLang);
           this.applyTranslations(this.selectedLang);
           $('#languageSection').classList.remove('active');
@@ -635,8 +647,7 @@
           $('#checkinForm').classList.remove('active');
           $('#dashboardSection').classList.add('active');
 
-          // Fire-and-forget for faster landing on dashboard
-          this.loadDriverData();
+          await this.loadDriverData();
           $('#submitBtn').disabled = false;
         });
 
@@ -832,50 +843,31 @@
 
       // ====== CORE METHODS ======
       async loadDriverData() {
-        // 1) Instant local render (no network)
-        const vmap = this.getVideoLinks();
-        const localLangList = (vmap[this.selectedLang] || []).map(video => ({
-          id: video.id, title: video.title, language: this.selectedLang, source: video,
-          status: 'assigned', assignedAt: new Date().toISOString().slice(0, 10), isAdminAdded: true
-        }));
-        this.assignments = localLangList.filter(a => {
-          const id = (a?.id || '').trim();
-          const title = (a?.title || '').trim();
-          return !DEMO_IDS.has(id) && !DEMO_TITLES.has(title);
-        });
+        // 1) Render instantly from local (no server wait)
+        const localAssignments = await this.fetchAssignmentsLocalOnly();
+        this.assignments = localAssignments;
         this.renderDashboard(this.assignments);
 
-        // 2) Fetch server data in parallel, then patch UI
-        let assignments = [];
-        let history = [];
-
-        const softTimeout = new Promise(resolve => setTimeout(resolve, 1500));
-        const loadPromise = (async () => {
-          [assignments, history] = await Promise.all([
-            this.fetchAssignmentsMerged(),
-            this.fetchHistory(this.driver.name, this.driver.truck)
+        // 2) Patch in server data in the background
+        try {
+          const [assignments, history] = await Promise.all([
+            this.fetchAssignmentsMerged(),                         // server + local
+            this.fetchHistory(this.driver.name, this.driver.truck) // server history
           ]);
-        })();
 
-        await Promise.race([loadPromise, softTimeout]);
-
-        if (assignments.length) {
-          this.assignments = this.mergeServerHistory(assignments, history).filter(a => {
+          const mergedFiltered = this.mergeServerHistory(assignments, history).filter(a => {
             const id = (a?.id || '').trim();
             const title = (a?.title || '').trim();
             return !DEMO_IDS.has(id) && !DEMO_TITLES.has(title);
           });
-          this.hydrateLocalWatchedFromServer(history);
-          this.renderDashboard(this.assignments);
-        }
 
-        await loadPromise; // ensure full data applied
-        this.assignments = this.mergeServerHistory(assignments, history).filter(a => {
-          const id = (a?.id || '').trim();
-          const title = (a?.title || '').trim();
-          return !DEMO_IDS.has(id) && !DEMO_TITLES.has(title);
-        });
-        this.renderDashboard(this.assignments);
+          this.hydrateLocalWatchedFromServer(history);
+          this.assignments = mergedFiltered;
+          this.renderDashboard(this.assignments);
+        } catch (err) {
+          console.error('Background fetch failed:', err);
+          // Keep the local-only view if server fails
+        }
       }
 
       async startAssignment(assignment) {
@@ -912,35 +904,18 @@
 
         const vmap = this.getVideoLinks();
         const meta = (vmap[this.selectedLang] || []).find(v => v.id === assignment.id) || assignment.source || {};
-        await this.renderPlayer(meta);
+        this.renderPlayer(meta);
       }
 
-      async ensureYouTubeAPI() {
-        if (window.YT && window.YT.Player) return;
-        await new Promise((resolve) => {
-          const s = document.createElement('script');
-          s.src = 'https://www.youtube.com/iframe_api';
-          s.async = true;
-          document.head.appendChild(s);
-          if (!window._ytReadyHooked) {
-            window._ytReadyHooked = true;
-            window.onYouTubeIframeAPIReady = () => resolve();
-          }
-          s.onload = () => {
-            if (window.YT && window.YT.Player) resolve();
-          };
-        });
-      }
-
-      async renderPlayer(meta) {
+      renderPlayer(meta) {
         const type = meta.type;
         $('#videoContainer').innerHTML = '';
         $('#completionSection').style.display = 'none';
 
         if (type === 'youtube') {
-          await this.ensureYouTubeAPI();
           const videoId = meta.videoId;
           $('#videoContainer').innerHTML = '<div id="ytPlayer"></div>';
+
           const initPlayer = () => {
             this.ytPlayer = new YT.Player('ytPlayer', {
               videoId, width: '100%', height: '100%',
@@ -948,8 +923,8 @@
               events: { onReady: this.onYTReady.bind(this), onStateChange: this.onYTStateChange.bind(this) }
             });
           };
-          if (window.YT && window.YT.Player) { initPlayer(); }
-          return;
+
+          ensureYouTubeAPI().then(initPlayer);
         }
         else if (type === 'mp4') {
           const url = meta.url;
@@ -1024,6 +999,73 @@
         }
       }
 
+      async submitCompletion() {
+        const end = new Date();
+        const ms = end - this.startTime;
+        const durationMin = Math.max(1, Math.round(ms / 60000));
+
+        const payload = {
+          op: 'complete',
+          name: this.driver.name,
+          truck: this.driver.truck,
+          language: this.selectedLang,
+          videoTitle: this.currentAssignment?.title || 'Unknown',
+          status: 'Completed',
+          duration: `${durationMin} minutes`,
+          assignmentId: this.currentAssignment?.id,
+          updateRowId: this.rowId || ''
+        };
+
+        let ok = true;
+        try { await this.postTrainingEvent(payload); } catch (e) { ok = false; }
+
+        if (this.currentAssignment?.id) {
+          this.markWatched(this.currentAssignment.id, {
+            completedAt: new Date().toISOString().slice(0, 10),
+            duration: `${durationMin} minutes`,
+            language: this.selectedLang
+          });
+        }
+
+        if (this.assignments && this.currentAssignment) {
+          const idx = this.assignments.findIndex(a => a.id === this.currentAssignment.id);
+          if (idx > -1) {
+            this.assignments[idx].status = 'completed';
+            this.assignments[idx].completedAt = new Date().toISOString().slice(0, 10);
+            this.assignments[idx].duration = `${durationMin} minutes`;
+            this.assignments[idx].language = this.selectedLang;
+          }
+        }
+
+        const t = this.getTranslations()[this.selectedLang] || TRANSLATIONS.English;
+        this.showToast(t.complete);
+        $('#videoContainer').innerHTML = '';
+
+        setTimeout(() => {
+          $('#videoSection').classList.remove('active');
+          $('#dashboardSection').classList.add('active');
+          $('#completionSection').style.display = 'none';
+          this.isAdminViewing = false;
+          this.renderDashboard(this.assignments || []);
+          this.applyTranslations(this.selectedLang);
+        }, 700);
+
+        if (!ok) this.showToast('Saved offline. Will sync when you tap "Sync Pending".');
+      }
+
+      closeVideoPlayer() {
+        clearInterval(this.progressPoll);
+        if (this.ytPlayer) { try { this.ytPlayer.destroy(); } catch (e) {} this.ytPlayer = null; }
+        if (this.currentObjectUrl) { try { URL.revokeObjectURL(this.currentObjectUrl); } catch (_) {} this.currentObjectUrl = ''; }
+        $('#videoSection').classList.remove('active');
+        if (this.isAdminViewing) { $('#adminPanelSection').classList.add('active'); } else { $('#dashboardSection').classList.add('active'); }
+        $('#completionSection').style.display = 'none';
+        $('#videoContainer').innerHTML = '';
+        this.showLoadingNote(false);
+        this.applyTranslations(this.selectedLang);
+        this.isAdminViewing = false;
+      }
+
       // ====== YOUTUBE EVENTS ======
       onYTReady(event) {
         this.showLoadingNote(false);
@@ -1095,19 +1137,6 @@
           <option value="">-- Select Language --</option>
           ${opts.map(lang => `<option value="${lang}">${lang}</option>`).join('')}
         `;
-      }
-
-      getTranslations() {
-        const custom = this.loadCustomLangs();
-        const translations = { ...TRANSLATIONS };
-        Object.entries(custom).forEach(([lang, data]) => {
-          if (data.translations) translations[lang] = { ...TRANSLATIONS.English, ...data.translations };
-        });
-        // Swahili aliases and safety casing
-        translations['Kiswahili'] = translations.Swahili;
-        translations['KiSwahili'] = translations.Swahili;
-        translations['SWAHILI']   = translations.Swahili;
-        return translations;
       }
 
       applyTranslations(lang) {
@@ -1212,7 +1241,6 @@
       renderAdminVideoList() {
         const vmap = this.getVideoLinks();
         const container = $('#adminVideoItems');
-        const t = this.getTranslations()[this.selectedLang] || TRANSLATIONS.English;
         container.innerHTML = '';
 
         Object.entries(vmap).forEach(([lang, videos]) => {
@@ -1229,15 +1257,15 @@
             const item = document.createElement('div');
             item.className = 'card mb-3';
 
-            const localBadge = video.type === 'local' ? `<span class="local-only">${t.localOnly}</span>` : '';
+            const localBadge = video.type === 'local' ? `<span class="local-only">${TRANSLATIONS.English.localOnly}</span>` : '';
 
             item.innerHTML = `
               <div class="card-body">
                 <div class="flex justify-between items-start">
                   <h4>${video.title}${localBadge}</h4>
                   <div class="flex gap-2">
-                    <button class="btn btn-sm btn-muted">${t.play}</button>
-                    <button class="btn btn-sm btn-danger">${t.delete || 'Delete'}</button>
+                    <button class="btn btn-sm btn-muted">Play</button>
+                    <button class="btn btn-sm btn-danger">Delete</button>
                   </div>
                 </div>
                 <p class="text-sm text-muted mt-1">${video.type} • ${video.id}</p>
@@ -1269,7 +1297,7 @@
                   this.assignments = this.assignments.filter(a => a.id !== video.id);
                   this.renderDashboard(this.assignments);
                 }
-                this.showToast(t.delete === 'Futa' ? 'Mafunzo yamefutwa' : 'Training deleted');
+                this.showToast('Training deleted');
               }
             });
 
@@ -1298,6 +1326,34 @@
             datalist.appendChild(option);
           });
         } catch (e) { console.error('Failed to load drivers:', e); }
+      }
+
+      // New: local-only assignments for instant render
+      async fetchAssignmentsLocalOnly() {
+        const vmap = this.getVideoLinks();
+
+        let list = (vmap[this.selectedLang] || []).map(video => ({
+          id: video.id, title: video.title, language: this.selectedLang, source: video,
+          status: 'assigned', assignedAt: new Date().toISOString().slice(0, 10), isAdminAdded: true
+        }));
+
+        // Fallback: all languages if current language is empty
+        if (list.length === 0) {
+          Object.entries(vmap).forEach(([lang, videos]) => {
+            videos.forEach(video => {
+              list.push({
+                id: video.id, title: video.title, language: lang, source: video,
+                status: 'assigned', assignedAt: new Date().toISOString().slice(0, 10), isAdminAdded: true
+              });
+            });
+          });
+        }
+
+        return list.filter(a => {
+          const id = (a?.id || '').trim();
+          const title = (a?.title || '').trim();
+          return !DEMO_IDS.has(id) && !DEMO_TITLES.has(title);
+        });
       }
 
       async fetchAssignmentsMerged() {
@@ -1451,6 +1507,15 @@
         catch { return {}; }
       }
       saveCustomLangs(data) { localStorage.setItem(CONFIG.STORAGE_KEYS.CUSTOM_LANGS, JSON.stringify(data || {})); }
+
+      getTranslations() {
+        const custom = this.loadCustomLangs();
+        const translations = { ...TRANSLATIONS };
+        Object.entries(custom).forEach(([lang, data]) => {
+          if (data.translations) translations[lang] = { ...TRANSLATIONS.English, ...data.translations };
+        });
+        return translations;
+      }
 
       getVideoLinks() {
         const custom = this.loadCustomLangs();
