@@ -467,7 +467,7 @@
     function loadAdminQueue() { try { return JSON.parse(localStorage.getItem(ADMIN_QUEUE_KEY) || '[]'); } catch { return []; } }
     function saveAdminQueue(list) { localStorage.setItem(ADMIN_QUEUE_KEY, JSON.stringify(list || [])); }
 
-    // -------- Lazy-load YouTube IFrame API when needed --------
+    /* -------- Lazy-load YouTube IFrame API when needed -------- */
     function ensureYouTubeAPI() {
       return new Promise((resolve) => {
         if (window.YT && window.YT.Player) return resolve();
@@ -850,7 +850,9 @@
           let seconds = 0;
           const timer = setInterval(() => {
             seconds++; this.watchedSeconds = Math.max(this.watchedSeconds, seconds);
-            if (!this.minReached && seconds >= CONFIG.MIN_WATCH_SECONDS) { this.minReached = true; $('#completionSection').style.display = 'block'; clearInterval(timer); }
+            if (!this.minReached && seconds >= CONFIG.MIN_WATCH_SECONDS) {
+              this.minReached = true; $('#completionSection').style.display = 'block'; clearInterval(timer);
+            }
           }, 1000);
         } else if (type === 'local') {
           this.idbGetUrl(meta.localKey).then(url => {
@@ -863,7 +865,9 @@
             video.addEventListener('canplay', () => this.showLoadingNote(false), { once: true });
             video.playbackRate = 1;
             video.addEventListener('ratechange', () => { if (video.playbackRate !== 1) video.playbackRate = 1; });
-            video.addEventListener('seeking', () => { if (video.currentTime > this.maxAllowedTime + CONFIG.ALLOW_SEEK_TOLERANCE) video.currentTime = this.maxAllowedTime; });
+            video.addEventListener('seeking', () => {
+              if (video.currentTime > this.maxAllowedTime + CONFIG.ALLOW_SEEK_TOLERANCE) video.currentTime = this.maxAllowedTime;
+            });
             video.addEventListener('timeupdate', () => {
               if (video.currentTime > this.maxAllowedTime) this.maxAllowedTime = video.currentTime;
               this.watchedSeconds = Math.max(this.watchedSeconds, Math.floor(this.maxAllowedTime));
