@@ -25,525 +25,130 @@
       --radius-full: 9999px;
       --transition: all 0.2s ease;
     }
-    
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-    }
-    
+    * { box-sizing: border-box; margin: 0; padding: 0; }
     html, body {
-      height: 100%;
-      width: 100%;
+      height: 100%; width: 100%;
       font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-      font-size: 16px;
-      line-height: 1.5;
-      color: var(--dark);
+      font-size: 16px; line-height: 1.5; color: var(--dark);
       background-color: #f1f5f9;
       background-image: url('trucks.jpg');
-      background-size: cover;
-      background-position: center;
-      background-attachment: fixed;
+      background-size: cover; background-position: center; background-attachment: fixed;
     }
-    
-    body::before {
-      content: "";
-      position: fixed;
-      inset: 0;
-      background: rgba(255,255,255,0.92);
-      z-index: -1;
-    }
-    
-    #app {
-      min-height: 100%;
-      display: flex;
-      flex-direction: column;
-    }
-    
-    .container {
-      width: 100%;
-      max-width: 1200px;
-      margin: 0 auto;
-      padding: 1rem;
-    }
-    
+    body::before { content: ""; position: fixed; inset: 0; background: rgba(255,255,255,0.92); z-index: -1; }
+    #app { min-height: 100%; display: flex; flex-direction: column; }
+    .container { width: 100%; max-width: 1200px; margin: 0 auto; padding: 1rem; }
+
     /* Sections */
-    .section {
-      display: none;
-      flex: 1;
-      padding: 1.5rem 0;
-    }
-    
-    .section.active {
-      display: block;
-      animation: fadeIn 0.3s ease;
-    }
-    
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(10px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-    
+    .section { display: none; flex: 1; padding: 1.5rem 0; }
+    .section.active { display: block; animation: fadeIn 0.3s ease; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
     /* Cards */
-    .card {
-      background: white;
-      border-radius: var(--radius-md);
-      box-shadow: var(--shadow-sm);
-      overflow: hidden;
-      transition: var(--transition);
-    }
-    
-    .card:hover {
-      box-shadow: var(--shadow-md);
-      transform: translateY(-2px);
-    }
-    
-    .card-header {
-      padding: 1rem 1.25rem;
-      border-bottom: 1px solid var(--border);
-    }
-    
-    .card-body {
-      padding: 1.25rem;
-    }
-    
-    .card-footer {
-      padding: 1rem 1.25rem;
-      border-top: 1px solid var(--border);
-    }
-    
+    .card { background: white; border-radius: var(--radius-md); box-shadow: var(--shadow-sm); overflow: hidden; transition: var(--transition); }
+    .card:hover { box-shadow: var(--shadow-md); transform: translateY(-2px); }
+    .card-header { padding: 1rem 1.25rem; border-bottom: 1px solid var(--border); }
+    .card-body { padding: 1.25rem; }
+    .card-footer { padding: 1rem 1.25rem; border-top: 1px solid var(--border); }
+
     /* Typography */
-    h1, h2, h3, h4 {
-      font-weight: 600;
-      line-height: 1.25;
-      margin-bottom: 0.75rem;
-    }
-    
-    h1 { font-size: 2rem; }
-    h2 { font-size: 1.5rem; }
-    h3 { font-size: 1.25rem; }
-    h4 { font-size: 1rem; }
-    
-    .text-muted {
-      color: var(--muted);
-    }
-    
-    .text-sm {
-      font-size: 0.875rem;
-    }
-    
-    /* Buttons */
-    .btn {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      padding: 0.5rem 1rem;
-      font-size: 0.875rem;
-      font-weight: 500;
-      line-height: 1.5;
-      border-radius: var(--radius-sm);
-      border: 1px solid transparent;
-      cursor: pointer;
-      transition: var(--transition);
-      user-select: none;
-      text-decoration: none;
-      white-space: nowrap;
-    }
-    
-    .btn:disabled {
-      opacity: 0.6;
-      cursor: not-allowed;
-    }
-    
-    .btn-sm {
-      padding: 0.375rem 0.75rem;
-      font-size: 0.8125rem;
-    }
-    
-    .btn-lg {
-      padding: 0.75rem 1.5rem;
-      font-size: 1rem;
-    }
-    
-    .btn-block {
-      display: flex;
-      width: 100%;
-    }
-    
-    .btn-primary {
-      background-color: var(--primary);
-      color: white;
-    }
-    
-    .btn-primary:hover {
-      background-color: var(--primary-dark);
-    }
-    
-    .btn-success {
-      background-color: var(--success);
-      color: white;
-    }
-    
-    .btn-success:hover {
-      background-color: #15803d;
-    }
-    
-    .btn-danger {
-      background-color: var(--danger);
-      color: white;
-    }
-    
-    .btn-danger:hover {
-      background-color: #b91c1c;
-    }
-    
-    .btn-muted {
-      background-color: var(--muted);
-      color: white;
-    }
-    
-    .btn-muted:hover {
-      background-color: #475569;
-    }
-    
-    .btn-outline {
-      background-color: transparent;
-      border-color: var(--border);
-      color: var(--dark);
-    }
-    
-    .btn-outline:hover {
-      background-color: #f8fafc;
-    }
-    
-    /* Forms */
-    .form-group {
-      margin-bottom: 1rem;
-    }
-    
-    .form-label {
-      display: block;
-      margin-bottom: 0.5rem;
-      font-weight: 500;
-      font-size: 0.875rem;
-    }
-    
-    .form-control {
-      display: block;
-      width: 100%;
-      padding: 0.5rem 0.75rem;
-      font-size: 0.875rem;
-      line-height: 1.5;
-      color: var(--dark);
-      background-color: white;
-      background-clip: padding-box;
-      border: 1px solid var(--border);
-      border-radius: var(--radius-sm);
-      transition: border-color 0.15s ease;
-    }
-    
-    .form-control:focus {
-      outline: 0;
-      border-color: var(--primary);
-      box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
-    }
-    
-    select.form-control {
-      appearance: none;
-      background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
-      background-position: right 0.5rem center;
-      background-repeat: no-repeat;
-      background-size: 1.5em 1.5em;
-      padding-right: 2.5rem;
-    }
-    
-    /* Badges */
-    .badge {
-      display: inline-flex;
-      align-items: center;
-      padding: 0.25rem 0.5rem;
-      font-size: 0.75rem;
-      font-weight: 500;
-      line-height: 1;
-      border-radius: var(--radius-full);
-      background-color: #e2e8f0;
-      color: #334155;
-    }
-    
-    .badge-primary {
-      background-color: #dbeafe;
-      color: #1e40af;
-    }
-    
-    .badge-success {
-      background-color: #dcfce7;
-      color: #166534;
-    }
-    
-    .badge-warning {
-      background-color: #fef3c7;
-      color: #92400e;
-    }
-    
-    .badge-danger {
-      background-color: #fee2e2;
-      color: #991b1b;
-    }
-    
-    /* Alerts */
-    .alert {
-      padding: 1rem;
-      border-radius: var(--radius-sm);
-      margin-bottom: 1rem;
-    }
-    
-    .alert-info {
-      background-color: #dbeafe;
-      color: #1e40af;
-    }
-    
-    .alert-success {
-      background-color: #dcfce7;
-      color: #166534;
-    }
-    
-    .alert-warning {
-      background-color: #fef3c7;
-      color: #92400e;
-    }
-    
-    .alert-danger {
-      background-color: #fee2e2;
-      color: #991b1b;
-    }
-    
-    /* Layout Utilities */
-    .flex {
-      display: flex;
-    }
-    
-    .flex-col {
-      flex-direction: column;
-    }
-    
-    .items-center {
-      align-items: center;
-    }
-    
-    .justify-center {
-      justify-content: center;
-    }
-    
-    .justify-between {
-      justify-content: space-between;
-    }
-    
-    .gap-1 { gap: 0.25rem; }
-    .gap-2 { gap: 0.5rem; }
-    .gap-3 { gap: 1rem; }
-    .gap-4 { gap: 1.5rem; }
-    .gap-5 { gap: 2rem; }
-    
-    .mt-1 { margin-top: 0.25rem; }
-    .mt-2 { margin-top: 0.5rem; }
-    .mt-3 { margin-top: 1rem; }
-    .mt-4 { margin-top: 1.5rem; }
-    .mt-5 { margin-top: 2rem; }
-    
-    .mb-1 { margin-bottom: 0.25rem; }
-    .mb-2 { margin-bottom: 0.5rem; }
-    .mb-3 { margin-bottom: 1rem; }
-    .mb-4 { margin-bottom: 1.5rem; }
-    .mb-5 { margin-bottom: 2rem; }
-    
+    h1, h2, h3, h4 { font-weight: 600; line-height: 1.25; margin-bottom: 0.75rem; }
+    h1 { font-size: 2rem; } h2 { font-size: 1.5rem; } h3 { font-size: 1.25rem; } h4 { font-size: 1rem; }
+    .text-muted { color: var(--muted); }
+    .text-sm { font-size: 0.875rem; }
     .text-center { text-align: center; }
-    
+
+    /* Buttons */
+    .btn { display: inline-flex; align-items: center; justify-content: center; padding: 0.5rem 1rem; font-size: 0.875rem; font-weight: 500; line-height: 1.5; border-radius: var(--radius-sm); border: 1px solid transparent; cursor: pointer; transition: var(--transition); user-select: none; text-decoration: none; white-space: nowrap; }
+    .btn:disabled { opacity: 0.6; cursor: not-allowed; }
+    .btn-sm { padding: 0.375rem 0.75rem; font-size: 0.8125rem; }
+    .btn-lg { padding: 0.75rem 1.5rem; font-size: 1rem; }
+    .btn-block { display: flex; width: 100%; }
+    .btn-primary { background-color: var(--primary); color: white; }
+    .btn-primary:hover { background-color: var(--primary-dark); }
+    .btn-success { background-color: var(--success); color: white; }
+    .btn-success:hover { background-color: #15803d; }
+    .btn-danger { background-color: var(--danger); color: white; }
+    .btn-danger:hover { background-color: #b91c1c; }
+    .btn-muted { background-color: var(--muted); color: white; }
+    .btn-muted:hover { background-color: #475569; }
+    .btn-outline { background-color: transparent; border-color: var(--border); color: var(--dark); }
+    .btn-outline:hover { background-color: #f8fafc; }
+
+    /* Forms */
+    .form-group { margin-bottom: 1rem; }
+    .form-label { display: block; margin-bottom: 0.5rem; font-weight: 500; font-size: 0.875rem; }
+    .form-control { display: block; width: 100%; padding: 0.5rem 0.75rem; font-size: 0.875rem; line-height: 1.5; color: var(--dark); background-color: white; border: 1px solid var(--border); border-radius: var(--radius-sm); transition: border-color 0.15s ease; }
+    .form-control:focus { outline: 0; border-color: var(--primary); box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1); }
+    select.form-control { appearance: none; background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e"); background-position: right 0.5rem center; background-repeat: no-repeat; background-size: 1.5em 1.5em; padding-right: 2.5rem; }
+
+    /* Badges */
+    .badge { display: inline-flex; align-items: center; padding: 0.25rem 0.5rem; font-size: 0.75rem; font-weight: 500; line-height: 1; border-radius: var(--radius-full); background-color: #e2e8f0; color: #334155; }
+    .badge-primary { background-color: #dbeafe; color: #1e40af; }
+    .badge-success { background-color: #dcfce7; color: #166534; }
+    .badge-warning { background-color: #fef3c7; color: #92400e; }
+    .badge-danger { background-color: #fee2e2; color: #991b1b; }
+
+    /* Alerts */
+    .alert { padding: 1rem; border-radius: var(--radius-sm); margin-bottom: 1rem; }
+    .alert-info { background-color: #dbeafe; color: #1e40af; }
+    .alert-success { background-color: #dcfce7; color: #166534; }
+    .alert-warning { background-color: #fef3c7; color: #92400e; }
+    .alert-danger { background-color: #fee2e2; color: #991b1b; }
+
+    /* Layout Utilities */
+    .flex { display: flex; }
+    .flex-col { flex-direction: column; }
+    .items-center { align-items: center; }
+    .justify-center { justify-content: center; }
+    .justify-between { justify-content: space-between; }
+    .gap-1 { gap: 0.25rem; } .gap-2 { gap: 0.5rem; } .gap-3 { gap: 1rem; } .gap-4 { gap: 1.5rem; } .gap-5 { gap: 2rem; }
+    .mt-1 { margin-top: 0.25rem; } .mt-2 { margin-top: 0.5rem; } .mt-3 { margin-top: 1rem; } .mt-4 { margin-top: 1.5rem; } .mt-5 { margin-top: 2rem; }
+    .mb-1 { margin-bottom: 0.25rem; } .mb-2 { margin-bottom: 0.5rem; } .mb-3 { margin-bottom: 1rem; } .mb-4 { margin-bottom: 1.5rem; } .mb-5 { margin-bottom: 2rem; }
+
     /* Dashboard Specific */
-    .dashboard-header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      margin-bottom: 1.5rem;
-      flex-wrap: wrap;
-      gap: 1rem;
-    }
-    
-    .driver-badge {
-      display: inline-flex;
-      align-items: center;
-      padding: 0.5rem 1rem;
-      background-color: var(--dark);
-      color: white;
-      border-radius: var(--radius-full);
-      font-weight: 500;
-      font-size: 0.875rem;
-      box-shadow: var(--shadow-sm);
-    }
-    
-    .tabs {
-      display: flex;
-      gap: 0.5rem;
-      margin-bottom: 1.5rem;
-      overflow-x: auto;
-      scrollbar-width: none;
-    }
-    
-    .tabs::-webkit-scrollbar {
-      display: none;
-    }
-    
-    .tab {
-      padding: 0.5rem 1rem;
-      border-radius: var(--radius-full);
-      background-color: #e2e8f0;
-      color: #334155;
-      font-weight: 500;
-      font-size: 0.875rem;
-      cursor: pointer;
-      transition: var(--transition);
-      white-space: nowrap;
-    }
-    
-    .tab.active {
-      background-color: var(--dark);
-      color: white;
-    }
-    
-    .tabpanel {
-      display: none;
-    }
-    
-    .tabpanel.active {
-      display: block;
-      animation: fadeIn 0.3s ease;
-    }
-    
-    .video-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-      gap: 1rem;
-    }
-    
-    @media (max-width: 768px) {
-      .video-grid {
-        grid-template-columns: 1fr;
-      }
-    }
-    
+    .dashboard-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.5rem; flex-wrap: wrap; gap: 1rem; }
+    .driver-badge { display: inline-flex; align-items: center; padding: 0.5rem 1rem; background-color: var(--dark); color: white; border-radius: var(--radius-full); font-weight: 500; font-size: 0.875rem; box-shadow: var(--shadow-sm); }
+    .tabs { display: flex; gap: 0.5rem; margin-bottom: 1.5rem; overflow-x: auto; scrollbar-width: none; }
+    .tabs::-webkit-scrollbar { display: none; }
+    .tab { padding: 0.5rem 1rem; border-radius: var(--radius-full); background-color: #e2e8f0; color: #334155; font-weight: 500; font-size: 0.875rem; cursor: pointer; transition: var(--transition); white-space: nowrap; }
+    .tab.active { background-color: var(--dark); color: white; }
+    .tabpanel { display: none; } .tabpanel.active { display: block; animation: fadeIn 0.3s ease; }
+    .video-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 1rem; }
+    @media (max-width: 768px) { .video-grid { grid-template-columns: 1fr; } }
+
     /* Video Player */
-    .video-player-container {
-      width: 100%;
-      max-width: 800px;
-      margin: 0 auto;
-    }
-    
-    .video-player {
-      width: 100%;
-      aspect-ratio: 16/9;
-      background-color: black;
-      border-radius: var(--radius-md);
-      overflow: hidden;
-    }
-    
-    .video-player iframe,
-    .video-player video {
-      width: 100%;
-      height: 100%;
-      border: none;
-    }
-    
+    .video-player-container { width: 100%; max-width: 800px; margin: 0 auto; }
+    .video-player { width: 100%; aspect-ratio: 16/9; background-color: black; border-radius: var(--radius-md); overflow: hidden; }
+    .video-player iframe, .video-player video { width: 100%; height: 100%; border: none; }
+
     /* Completion Section */
-    .completion-section {
-      position: fixed;
-      bottom: 1.5rem;
-      left: 50%;
-      transform: translateX(-50%);
-      background: white;
-      padding: 1rem 1.5rem;
-      border-radius: var(--radius-md);
-      box-shadow: var(--shadow-lg);
-      z-index: 10;
-      display: none;
-      max-width: 90%;
-      width: 400px;
-    }
-    
+    .completion-section { position: fixed; bottom: 1.5rem; left: 50%; transform: translateX(-50%); background: white; padding: 1rem 1.5rem; border-radius: var(--radius-md); box-shadow: var(--shadow-lg); z-index: 10; display: none; max-width: 90%; width: 400px; }
+
     /* Toast */
-    .toast {
-      position: fixed;
-      top: 1rem;
-      left: 50%;
-      transform: translateX(-50%);
-      background-color: var(--dark);
-      color: white;
-      padding: 0.75rem 1.25rem;
-      border-radius: var(--radius-md);
-      box-shadow: var(--shadow-lg);
-      z-index: 50;
-      display: none;
-      max-width: 90%;
-      width: 350px;
-      text-align: center;
-    }
-    
+    .toast { position: fixed; top: 1rem; left: 50%; transform: translateX(-50%); background-color: var(--dark); color: white; padding: 0.75rem 1.25rem; border-radius: var(--radius-md); box-shadow: var(--shadow-lg); z-index: 50; display: none; max-width: 90%; width: 350px; text-align: center; }
+
     /* Loading Spinner */
-    .spinner {
-      display: inline-block;
-      width: 1.5rem;
-      height: 1.5rem;
-      border: 3px solid rgba(255,255,255,0.3);
-      border-radius: 50%;
-      border-top-color: white;
-      animation: spin 1s ease-in-out infinite;
-    }
-    
-    @keyframes spin {
-      to { transform: rotate(360deg); }
-    }
-    
+    .spinner { display: inline-block; width: 1.5rem; height: 1.5rem; border: 3px solid rgba(255,255,255,0.3); border-radius: 50%; border-top-color: white; animation: spin 1s ease-in-out infinite; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
     /* Local Only Badge */
-.local-only {
-  background-color: #ffedd5;
-  color: #9a3412;
-  border: 1px solid #fed7aa;
-  padding: 0.125rem 0.5rem;
-  border-radius: var(--radius-full);
-  font-size: 0.75rem;
-  margin-left: 0.5rem;
-}
+    .local-only { background-color: #ffedd5; color: #9a3412; border: 1px solid #fed7aa; padding: 0.125rem 0.5rem; border-radius: var(--radius-full); font-size: 0.75rem; margin-left: 0.5rem; }
 
-/* Responsive Adjustments */
-@media (max-width: 640px) {
-  body::before {
-    background: rgba(255,255,255,0.96);
-  }
-  
-  .section {
-    padding: 1rem 0;
-  }
-  
-  .dashboard-header {
-    flex-direction: column;
-    align-items: flex-start;
-  }
-  
-  .completion-section {
-    width: calc(100% - 2rem);
-  }
-}
+    /* Responsive Adjustments */
+    @media (max-width: 640px) {
+      body::before { background: rgba(255,255,255,0.96); }
+      .section { padding: 1rem 0; }
+      .dashboard-header { flex-direction: column; align-items: flex-start; }
+      .completion-section { width: calc(100% - 2rem); }
+    }
 
-/* Make the "no trainings" messages have a paper-like background */
-#lobbyEmpty,
-#historyEmpty {
-  display: inline-block; /* shrink background to fit text */
-  background-color: rgba(255, 255, 255, 0.9); /* white with transparency */
-  padding: 0.75rem 1rem;
-  border-radius: var(--radius-md); /* matches your theme */
-  box-shadow: var(--shadow-sm);
-  color: var(--dark);
-  border: 1px solid var(--border); /* optional thin border */
-}
-</style>
+    /* Paper-like background for empty states */
+    #lobbyEmpty, #historyEmpty {
+      display: inline-block; background-color: rgba(255, 255, 255, 0.9);
+      padding: 0.75rem 1rem; border-radius: var(--radius-md); box-shadow: var(--shadow-sm);
+      color: var(--dark); border: 1px solid var(--border);
+    }
+  </style>
 </head>
 <body>
   <div id="app">
@@ -599,7 +204,7 @@
             <button id="adminPanelBtn" class="btn btn-muted" style="display: none;">Admin Panel</button>
           </div>
         </div>
-        
+
         <div class="tabs">
           <div class="tab active" data-tab="lobby" id="tabLobby">Lobby (Assigned)</div>
           <div class="tab" data-tab="history" id="tabHistory">History (Completed)</div>
@@ -608,12 +213,12 @@
           <button id="syncBtn" class="btn btn-muted">Sync Pending</button>
           <button id="changeDriverBtn" class="btn btn-danger">Change Driver</button>
         </div>
-        
+
         <div id="lobby" class="tabpanel active">
           <div id="lobbyList" class="video-grid"></div>
           <p id="lobbyEmpty" class="text-center text-muted mt-4" style="display: none;">No pending trainings. Great job!</p>
         </div>
-        
+
         <div id="history" class="tabpanel">
           <div id="historyList" class="video-grid"></div>
           <p id="historyEmpty" class="text-center text-muted mt-4" style="display: none;">No completed trainings yet.</p>
@@ -628,9 +233,9 @@
           <button id="closeBtn" class="btn btn-danger">Cancel</button>
           <h3 id="activeVideoTitle" class="text-center"></h3>
         </div>
-        
+
         <div id="videoNote" class="alert alert-info" style="display: none;"></div>
-        
+
         <div class="video-player-container">
           <div id="videoContainer" class="video-player"></div>
         </div>
@@ -698,12 +303,12 @@
                       </div>
                     </div>
                   </div>
-                  
+
                   <div class="form-group mt-3">
                     <label for="videoTitle" class="form-label">Title</label>
                     <input type="text" id="videoTitle" class="form-control" placeholder="Training Title" required />
                   </div>
-                  
+
                   <div class="flex gap-3 flex-wrap">
                     <div class="form-group flex-1" style="min-width: 200px;">
                       <label for="videoType" class="form-label">Video Type</label>
@@ -721,16 +326,16 @@
                       <input type="file" id="videoFile" class="form-control mt-2" accept="video/*" style="display: none;" />
                     </div>
                   </div>
-                  
+
                   <div class="form-group mt-3">
                     <label for="videoNoteAdmin" class="form-label">Notes (Optional)</label>
                     <textarea id="videoNoteAdmin" class="form-control" rows="2" placeholder="Additional information for drivers"></textarea>
                   </div>
-                  
+
                   <button id="saveVideoBtn" class="btn btn-primary btn-block mt-4">Save Training</button>
                 </div>
               </div>
-              
+
               <div class="card">
                 <div class="card-header">
                   <h3>Manage Trainings</h3>
@@ -752,7 +357,7 @@
   <!-- Toast Notification -->
   <div id="toast" class="toast"></div>
 
-  <!-- Light query helpers (FIX for unclickable buttons) -->
+  <!-- Light query helpers -->
   <script>
     const $  = (sel, root = document) => root.querySelector(sel);
     const $$ = (sel, root = document) => Array.from(root.querySelectorAll(sel));
@@ -764,14 +369,11 @@
   <script>
     // ======= CONFIGURATION =======
     const CONFIG = {
-      // Backend URL (Google Apps Script)
       BASE_URL: 'https://script.google.com/macros/s/AKfycbyKO9F0m-VP89q2RTMpLgkKWMuUoKOR8HqReocgIrdqe7ZM1tyisLqhNDSnujdXHGyfYA/exec',
-      
-      // Video requirements
       MIN_WATCH_SECONDS: 40,
       REVEAL_BEFORE_END: 10,
       ALLOW_SEEK_TOLERANCE: 1.25,
-      
+
       // Admin authentication
       ADMIN_EMAIL_SUFFIX: '@alistairgroup.com',
       ADMIN_ACCESS_CODE: 'AG-TRAINING-2025',
@@ -779,11 +381,11 @@
         'admin@alistairgroup.com': 'admin123',
         'training@alistairgroup.com': 'training123'
       },
-      
+
       // Logging policy
-      LOG_SESSION_START: false,  // Don't log session start events
-      LOG_COURSE_STARTED: true,  // Log when course starts
-      
+      LOG_SESSION_START: false,
+      LOG_COURSE_STARTED: true,
+
       // Local storage keys
       STORAGE_KEYS: {
         PENDING_EVENTS: 'driver_training_pending_events_v2',
@@ -793,148 +395,86 @@
         DRIVER_STATE: 'driver_training_driverstate_',
         ADMIN_AUTH: 'driver_training_admin_auth_v1'
       },
-      
+
       // IndexedDB for local videos
       DB_NAME: 'driver_training_db',
       DB_STORE: 'videos'
     };
 
+    /* ======= DEMO PURGE DEFINITIONS (removes old sample trainings) ======= */
+    const DEMO_IDS = new Set(['eng-001','swa-002','bem-003','por-004']);
+    const DEMO_TITLES = new Set([
+      'Driver Tiredness, Fatigue and Road Safety',
+      'Kampeni ya Usalama kwa Madereva',
+      'Kampeni ya Ukusalama kwa Abapashi',
+      'Campanha de Segurança para Motoristas'
+    ]);
+    const DEMO_PURGE_FLAG = 'driver_training_demo_purged_v1';
+    /* ==================================================================== */
+
     // ====== TRANSLATIONS ======
     const TRANSLATIONS = {
       English: {
-        code: 'en',
-        dir: 'ltr',
+        code: 'en', dir: 'ltr',
         langTitle: 'Select Language',
         choose: '-- Choose a Language --',
         pageTitle: 'Driver Training Portal',
-        continue: 'Continue',
-        back: 'Back',
-        cancel: 'Cancel Video',
-        formTitle: 'Driver Check-In',
-        name: 'Full Name',
-        truck: 'Truck Number',
-        submit: 'Continue to Dashboard',
-        complete: 'Training Completed!',
-        dash: 'Training Dashboard',
-        lobby: 'Lobby (Assigned)',
-        history: 'History (Completed)',
-        sync: 'Sync Pending',
-        change: 'Change Driver',
-        play: 'Start Training',
-        status: 'Status',
-        assigned: 'Assigned',
-        duration: 'Duration',
-        noPending: 'No pending trainings. Great job!',
-        noHistory: 'No completed trainings yet.',
-        loadingVideo: 'Preparing training...',
-        adminLogin: 'Admin Login',
-        sort: 'Sort',
-        recent: 'Recent',
-        oldest: 'Oldest',
-        alertSelectLang: 'Please select a language.',
-        alertFillAll: 'Please fill in all fields.',
-        localOnly: 'Local Only'
+        continue: 'Continue', back: 'Back', cancel: 'Cancel Video',
+        formTitle: 'Driver Check-In', name: 'Full Name', truck: 'Truck Number',
+        submit: 'Continue to Dashboard', complete: 'Training Completed!',
+        dash: 'Training Dashboard', lobby: 'Lobby (Assigned)', history: 'History (Completed)',
+        sync: 'Sync Pending', change: 'Change Driver', play: 'Start Training',
+        status: 'Status', assigned: 'Assigned', duration: 'Duration',
+        noPending: 'No pending trainings. Great job!', noHistory: 'No completed trainings yet.',
+        loadingVideo: 'Preparing training...', adminLogin: 'Admin Login',
+        sort: 'Sort', recent: 'Recent', oldest: 'Oldest', alertSelectLang: 'Please select a language.',
+        alertFillAll: 'Please fill in all fields.', localOnly: 'Local Only'
       },
       Swahili: {
-        code: 'sw',
-        dir: 'ltr',
+        code: 'sw', dir: 'ltr',
         langTitle: 'Chagua Lugha',
         choose: '-- Chagua Lugha --',
         pageTitle: 'Kuingia kwa Dereva',
-        continue: 'Endelea',
-        back: 'Rudi',
-        cancel: 'Sitisha Video',
-        formTitle: 'Kuingia kwa Dereva',
-        name: 'Jina Kamili',
-        truck: 'Namba ya Gari',
-        submit: 'Nenda kwenye Dashibodi',
-        complete: 'Mafunzo yamekamilika!',
-        dash: 'Dashibodi ya Mafunzo',
-        lobby: 'Ukumbi (Zilizokabidhiwa)',
-        history: 'Historia (Zilizokamilika)',
-        sync: 'Sawazisha',
-        change: 'Badilisha Dereva',
-        play: 'Anza Mafunzo',
-        status: 'Hali',
-        assigned: 'Iliyokabidhiwa',
-        duration: 'Muda',
-        noPending: 'Hakuna mafunzo yanayosubiri. Kazi nzuri!',
-        noHistory: 'Bado hakuna mafunzo yaliyokamilika.',
-        loadingVideo: 'Inapakia mafunzo...',
-        adminLogin: 'Ingia kwa Admin',
-        sort: 'Panga',
-        recent: 'Za Hivi Karibuni',
-        oldest: 'Za Zamani',
-        alertSelectLang: 'Tafadhali chagua lugha.',
-        alertFillAll: 'Tafadhali jaza sehemu zote.',
+        continue: 'Endelea', back: 'Rudi', cancel: 'Sitisha Video',
+        formTitle: 'Kuingia kwa Dereva', name: 'Jina Kamili', truck: 'Namba ya Gari',
+        submit: 'Nenda kwenye Dashibodi', complete: 'Mafunzo yamekamilika!',
+        dash: 'Dashibodi ya Mafunzo', lobby: 'Ukumbi (Zilizokabidhiwa)', history: 'Historia (Zilizokamilika)',
+        sync: 'Sawazisha', change: 'Badilisha Dereva', play: 'Anza Mafunzo',
+        status: 'Hali', assigned: 'Iliyokabidhiwa', duration: 'Muda',
+        noPending: 'Hakuna mafunzo yanayosubiri. Kazi nzuri!', noHistory: 'Bado hakuna mafunzo yaliyokamilika.',
+        loadingVideo: 'Inapakia mafunzo...', adminLogin: 'Ingia kwa Admin',
+        sort: 'Panga', recent: 'Za Hivi Karibuni', oldest: 'Za Zamani',
+        alertSelectLang: 'Tafadhali chagua lugha.', alertFillAll: 'Tafadhali jaza sehemu zote.',
         localOnly: 'Ya Ndani Tu'
       },
       Bemba: {
-        code: 'bem',
-        dir: 'ltr',
-        langTitle: 'Sankeni Ululimi',
-        choose: '-- Sankeni Ululimi --',
-        pageTitle: 'Ifyebo fya Kwingilila',
-        continue: 'Tendekela',
-        back: 'Baya',
-        cancel: 'Fumya Video',
-        formTitle: 'Ifyebo fya Kwingilila',
-        name: 'Amashina Yonse',
-        truck: 'Namba ya Motoka',
-        submit: 'Ya ku Dashboard',
-        complete: 'Ifyakusambilila fyapwa!',
-        dash: 'Dashboard ya Ifyakusambilila',
-        lobby: 'Lobby (Ifyasalwike)',
-        history: 'Historia (Fyapwa)',
-        sync: 'Sync',
-        change: 'Chinja Umupashi',
-        play: 'Anza Ifyakusambilila',
-        status: 'Inshita',
-        assigned: 'Lyasangwa',
-        duration: 'Ubushiku',
-        noPending: 'Tapali ifyasangwa. Umucinshi!',
-        noHistory: 'Tachapwa nangu kamo pano.',
-        loadingVideo: 'Ukupakila ifyakusambilila...',
-        adminLogin: 'Admin Login',
-        sort: 'Teekanya',
-        recent: 'Ifyapya',
-        oldest: 'Ifyakale',
-        alertSelectLang: 'Sankeni ululimi.',
-        alertFillAll: 'Sambilileni ifyose.',
+        code: 'bem', dir: 'ltr',
+        langTitle: 'Sankeni Ululimi', choose: '-- Sankeni Ululimi --',
+        pageTitle: 'Ifyebo fya Kwingilila', continue: 'Tendekela', back: 'Baya', cancel: 'Fumya Video',
+        formTitle: 'Ifyebo fya Kwingilila', name: 'Amashina Yonse', truck: 'Namba ya Motoka',
+        submit: 'Ya ku Dashboard', complete: 'Ifyakusambilila fyapwa!',
+        dash: 'Dashboard ya Ifyakusambilila', lobby: 'Lobby (Ifyasalwike)', history: 'Historia (Fyapwa)',
+        sync: 'Sync', change: 'Chinja Umupashi', play: 'Anza Ifyakusambilila',
+        status: 'Inshita', assigned: 'Lyasangwa', duration: 'Ubushiku',
+        noPending: 'Tapali ifyasangwa. Umucinshi!', noHistory: 'Tachapwa nangu kamo pano.',
+        loadingVideo: 'Ukupakila ifyakusambilila...', adminLogin: 'Admin Login',
+        sort: 'Teekanya', recent: 'Ifyapya', oldest: 'Ifyakale',
+        alertSelectLang: 'Sankeni ululimi.', alertFillAll: 'Sambilileni ifyose.',
         localOnly: 'Ya Konse Konse'
       },
       Portuguese: {
-        code: 'pt',
-        dir: 'ltr',
-        langTitle: 'Selecione o Idioma',
-        choose: '-- Selecione o Idioma --',
-        pageTitle: 'Portal de Treinamento',
-        continue: 'Continuar',
-        back: 'Voltar',
-        cancel: 'Cancelar Vídeo',
-        formTitle: 'Registro do Motorista',
-        name: 'Nome Completo',
-        truck: 'Número do Caminhão',
-        submit: 'Ir para o Painel',
-        complete: 'Treinamento Concluído!',
-        dash: 'Painel de Treinamentos',
-        lobby: 'Lobby (Atribuídos)',
-        history: 'Histórico (Concluídos)',
-        sync: 'Sincronizar',
-        change: 'Trocar Motorista',
-        play: 'Iniciar Treinamento',
-        status: 'Estado',
-        assigned: 'Atribuído',
-        duration: 'Duração',
-        noPending: 'Sem treinamentos pendentes. Bom trabalho!',
-        noHistory: 'Ainda não há treinamentos concluídos.',
-        loadingVideo: 'Preparando treinamento...',
-        adminLogin: 'Login do Administrador',
-        sort: 'Ordenar',
-        recent: 'Mais recentes',
-        oldest: 'Mais antigas',
-        alertSelectLang: 'Selecione um idioma.',
-        alertFillAll: 'Preencha todos os campos.',
+        code: 'pt', dir: 'ltr',
+        langTitle: 'Selecione o Idioma', choose: '-- Selecione o Idioma --',
+        pageTitle: 'Portal de Treinamento', continue: 'Continuar', back: 'Voltar', cancel: 'Cancelar Vídeo',
+        formTitle: 'Registro do Motorista', name: 'Nome Completo', truck: 'Número do Caminhão',
+        submit: 'Ir para o Painel', complete: 'Treinamento Concluído!',
+        dash: 'Painel de Treinamentos', lobby: 'Lobby (Atribuídos)', history: 'Histórico (Concluídos)',
+        sync: 'Sincronizar', change: 'Trocar Motorista', play: 'Iniciar Treinamento',
+        status: 'Estado', assigned: 'Atribuído', duration: 'Duração',
+        noPending: 'Sem treinamentos pendentes. Bom trabalho!', noHistory: 'Ainda não há treinamentos concluídos.',
+        loadingVideo: 'Preparando treinamento...', adminLogin: 'Login do Administrador',
+        sort: 'Ordenar', recent: 'Mais recentes', oldest: 'Mais antigas',
+        alertSelectLang: 'Selecione um idioma.', alertFillAll: 'Preencha todos os campos.',
         localOnly: 'Apenas Local'
       }
     };
@@ -942,7 +482,7 @@
     // ====== CORE FUNCTIONALITY ======
     class DriverTrainingApp {
       constructor() {
-        // State management
+        // State
         this.selectedLang = localStorage.getItem(CONFIG.STORAGE_KEYS.LANGUAGE) || 'English';
         this.lobbySort = localStorage.getItem(CONFIG.STORAGE_KEYS.SORT_PREFERENCE) || 'recent';
         this.driver = { name: '', truck: '' };
@@ -950,8 +490,8 @@
         this.assignments = [];
         this.currentAssignment = null;
         this.isAdminViewing = false;
-        
-        // Video player state
+
+        // Video state
         this.ytPlayer = null;
         this.progressPoll = null;
         this.maxAllowedTime = 0;
@@ -961,25 +501,60 @@
         this.rowId = '';
         this.currentObjectUrl = '';
 
-        // Initialize the app
+        // Init
         this.initDOM();
         this.initEventListeners();
         this.applyTranslations(this.selectedLang);
         this.loadDrivers();
         this.showAdminPanel(this.isAdminLoggedIn());
+
+        /* One-time purge of legacy demo trainings */
+        if (!localStorage.getItem(DEMO_PURGE_FLAG)) {
+          this.purgeDemoVideos();
+          localStorage.setItem(DEMO_PURGE_FLAG, '1');
+        }
+
         this.renderAdminVideoList();
 
         // Auto-sync when back online
         window.addEventListener('online', () => this.flushPendingEvents());
       }
-      
+
+      /* ===== Purge demo trainings from local storage & in-memory ===== */
+      purgeDemoVideos() {
+        const custom = this.loadCustomLangs();
+        let changed = false;
+
+        Object.entries(custom).forEach(([lang, data]) => {
+          const list = Array.isArray(data?.videos) ? data.videos : [];
+          const filtered = list.filter(v => {
+            const id = (v?.id || '').trim();
+            const title = (v?.title || '').trim();
+            return !DEMO_IDS.has(id) && !DEMO_TITLES.has(title);
+          });
+          if (filtered.length !== list.length) {
+            custom[lang].videos = filtered;
+            changed = true;
+          }
+        });
+
+        if (changed) this.saveCustomLangs(custom);
+
+        if (Array.isArray(this.assignments) && this.assignments.length) {
+          this.assignments = this.assignments.filter(a => {
+            const id = (a?.id || '').trim();
+            const title = (a?.title || '').trim();
+            return !DEMO_IDS.has(id) && !DEMO_TITLES.has(title);
+          });
+        }
+      }
+
       // ====== DOM INITIALIZATION ======
       initDOM() {
-        // Populate language selects
         this.populateLanguageSelect();
         this.populateAdminLangSelect();
       }
-      
+
       // ====== EVENT LISTENERS ======
       initEventListeners() {
         // Language selection
@@ -989,7 +564,7 @@
           this.applyTranslations(this.selectedLang);
           if (this.assignments.length) this.renderDashboard(this.assignments);
         });
-        
+
         // Continue to check-in
         $('#continueBtn').addEventListener('click', () => {
           if (!$('#languageSelect').value) {
@@ -1003,8 +578,8 @@
           $('#languageSection').classList.remove('active');
           $('#checkinForm').classList.add('active');
         });
-        
-        // Back from check-in (section, not form)
+
+        // Back from check-in
         $('#backBtn').addEventListener('click', () => {
           $('#name').value = '';
           $('#truck').value = '';
@@ -1013,108 +588,103 @@
           $('#checkinForm').classList.remove('active');
           $('#languageSection').classList.add('active');
         });
-        
-        // Driver check-in button (since #checkinForm is not a <form>)
+
+        // Check-in submit
         $('#submitBtn').addEventListener('click', async (e) => {
           e.preventDefault();
           const t = this.getTranslations()[this.selectedLang] || TRANSLATIONS.English;
-          
+
           if (!$('#name').value.trim() || !$('#truck').value.trim()) {
             this.showToast(t.alertFillAll || 'Please fill in all fields.');
             return;
           }
-          
+
           $('#submitBtn').disabled = true;
-          this.driver = { 
-            name: $('#name').value.trim(), 
-            truck: $('#truck').value.trim() 
+          this.driver = {
+            name: $('#name').value.trim(),
+            truck: $('#truck').value.trim()
           };
-          
-          // Save driver state
+
           const driverState = this.loadDriverState();
           driverState.lang = this.selectedLang;
           this.saveDriverState(driverState);
-          
-          // Update UI
+
           $('#driverBadge').textContent = `${this.driver.name} • ${this.driver.truck}`;
           this.applyTranslations(this.selectedLang);
-          
-          // Show dashboard immediately
+
           $('#checkinForm').classList.remove('active');
           $('#dashboardSection').classList.add('active');
-          
-          // Load assignments and history (with timeout)
+
           await this.loadDriverData();
-          
           $('#submitBtn').disabled = false;
         });
-        
-        // Name autocomplete for truck number
+
+        // Name autocomplete
         $('#name').addEventListener('input', () => {
-          const match = this.driverList.find(d => 
+          const match = this.driverList.find(d =>
             d.name.toLowerCase() === $('#name').value.toLowerCase()
           );
           $('#truck').value = match ? match.truck : '';
         });
-        
-        // Dashboard tabs
+
+        // Tabs
         document.querySelectorAll('.tab').forEach(tab => {
           tab.addEventListener('click', () => this.setActiveTab(tab.dataset.tab));
         });
-        
-        // Sort button
+
+        // Sort
         $('#sortBtn').addEventListener('click', () => {
           this.lobbySort = this.lobbySort === 'recent' ? 'oldest' : 'recent';
           localStorage.setItem(CONFIG.STORAGE_KEYS.SORT_PREFERENCE, this.lobbySort);
           this.applyTranslations(this.selectedLang);
           this.renderDashboard(this.assignments);
         });
-        
-        // Change driver button
+
+        // Change driver
         $('#changeDriverBtn').addEventListener('click', () => {
           $('#dashboardSection').classList.remove('active');
           $('#checkinForm').classList.add('active');
           this.applyTranslations(this.selectedLang);
         });
-        
-        // Sync pending button
+
+        // Sync
         $('#syncBtn').addEventListener('click', () => this.flushPendingEvents());
-        
-        // Video close button
+
+        // Video close
         $('#closeBtn').addEventListener('click', () => this.closeVideoPlayer());
-        
-        // Delegated handler for dynamic complete button
+
+        // Completion
         document.addEventListener('click', (e) => {
           if (e.target && e.target.id === 'completeBtn') this.submitCompletion();
         });
-        
-        // Admin login
+
+        // Admin login nav
         $('#adminLoginBtn').addEventListener('click', () => {
           $('#languageSection').classList.remove('active');
           $('#adminLoginSection').classList.add('active');
         });
-        
+
         $('#adminBackBtn').addEventListener('click', () => {
           $('#adminLoginSection').classList.remove('active');
           $('#languageSection').classList.add('active');
         });
-        
+
+        // Admin login
         $('#adminSubmitBtn').addEventListener('click', () => {
           const email = $('#adminEmail').value.trim().toLowerCase();
           const password = $('#adminPassword').value.trim();
           const code = $('#adminCode').value.trim();
-          
-          // Tighten authentication
+
           const codeOK = code && code === CONFIG.ADMIN_ACCESS_CODE;
           const corpOK = email.endsWith(CONFIG.ADMIN_EMAIL_SUFFIX);
           const mapOK = CONFIG.ADMIN_CREDENTIALS[email] && CONFIG.ADMIN_CREDENTIALS[email] === password;
           const allow = codeOK || (corpOK && mapOK);
-          
+
           if (!allow) {
             this.showToast('Invalid admin credentials');
             return;
           }
-          
+
           this.setAdminLoggedIn(true);
           $('#adminEmail').value = '';
           $('#adminPassword').value = '';
@@ -1123,34 +693,29 @@
           $('#adminPanelSection').classList.add('active');
           this.showAdminPanel(true);
         });
-        
-        // Admin panel
+
+        // Admin nav button
         $('#adminPanelBtn').addEventListener('click', () => {
           $('#dashboardSection').classList.remove('active');
           $('#adminPanelSection').classList.add('active');
         });
-        
+
+        // Admin logout
         $('#adminLogoutBtn').addEventListener('click', () => {
           this.setAdminLoggedIn(false);
           $('#adminPanelSection').classList.remove('active');
           $('#languageSection').classList.add('active');
           this.showAdminPanel(false);
         });
-        
+
         // Admin: add language
         $('#addLangBtn').addEventListener('click', () => {
           const langName = $('#newLangName').value.trim();
-          if (!langName) {
-            this.showToast('Please enter a language name');
-            return;
-          }
-          
+          if (!langName) { this.showToast('Please enter a language name'); return; }
+
           const custom = this.loadCustomLangs();
-          if (custom[langName]) {
-            this.showToast('This language already exists');
-            return;
-          }
-          
+          if (custom[langName]) { this.showToast('This language already exists'); return; }
+
           custom[langName] = { translations: {}, videos: [] };
           this.saveCustomLangs(custom);
           this.populateLanguageSelect();
@@ -1158,128 +723,84 @@
           $('#newLangName').value = '';
           this.showToast(`Language "${langName}" added`);
         });
-        
-        // Admin: video type change
+
+        // Admin: video type switch
         $('#videoType').addEventListener('change', () => {
           const type = $('#videoType').value;
           $('#videoId').style.display = type === 'local' ? 'none' : 'block';
           $('#videoFile').style.display = type === 'local' ? 'block' : 'none';
-          
-          // Update label
+
           const label = $('#videoSourceLabel');
           if (type === 'youtube') label.textContent = 'YouTube ID/URL';
           else if (type === 'drive') label.textContent = 'Google Drive URL';
           else if (type === 'mp4') label.textContent = 'MP4 URL';
           else label.textContent = 'Video File';
         });
-        
+
         // Admin: save video
         $('#saveVideoBtn').addEventListener('click', async () => {
           const lang = $('#adminLangSelect').value;
           const title = $('#videoTitle').value.trim();
           const type = $('#videoType').value;
           const note = $('#videoNoteAdmin').value.trim();
-          
+
           if (!lang || !title || !type) {
             this.showToast('Please fill all required fields');
             return;
           }
-          
-          let videoData = { 
-            id: this.generateId(), 
-            title, 
-            type, 
-            note 
-          };
-          
+
+          let videoData = { id: this.generateId(), title, type, note };
+
           try {
-            // Handle different video types
             if (type === 'youtube') {
               const idOrUrl = $('#videoId').value.trim();
               const videoId = this.parseYouTubeId(idOrUrl);
-              if (!videoId) {
-                this.showToast('Invalid YouTube ID or URL');
-                return;
-              }
+              if (!videoId) { this.showToast('Invalid YouTube ID or URL'); return; }
               videoData.videoId = videoId;
-            } 
-            else if (type === 'drive') {
+            } else if (type === 'drive') {
               const url = $('#videoId').value.trim();
               const driveId = this.extractDriveFileId(url);
-              if (!driveId) {
-                this.showToast('Invalid Google Drive link');
-                return;
-              }
+              if (!driveId) { this.showToast('Invalid Google Drive link'); return; }
               videoData.driveId = driveId;
-            } 
-            else if (type === 'mp4') {
+            } else if (type === 'mp4') {
               const url = $('#videoId').value.trim();
-              if (!/^https?:\/\//i.test(url)) {
-                this.showToast('Enter a valid MP4 URL');
-                return;
-              }
+              if (!/^https?:\/\//i.test(url)) { this.showToast('Enter a valid MP4 URL'); return; }
               videoData.url = url;
-            } 
-            else if (type === 'local') {
+            } else if (type === 'local') {
               const file = $('#videoFile').files?.[0];
-              if (!file) {
-                this.showToast('Choose a video file');
-                return;
-              }
-              
-              // Store in IndexedDB
+              if (!file) { this.showToast('Choose a video file'); return; }
               const localKey = videoData.id;
-              try {
-                await this.idbPut(localKey, file);
-                videoData.localKey = localKey;
-              } catch (e) {
-                console.error('Failed to store video:', e);
-                this.showToast('Failed to store video file');
-                return;
-              }
+              try { await this.idbPut(localKey, file); videoData.localKey = localKey; }
+              catch (e) { console.error('Failed to store video:', e); this.showToast('Failed to store video file'); return; }
             }
-            
-            // Save video data
+
+            // Save locally
             const vmap = this.getVideoLinks();
             const list = (vmap[lang] || []).filter(v => v.id !== videoData.id).concat(videoData);
             this.setVideoLinksForLang(lang, list);
-            
-            // Try to sync to server (except local videos)
+
+            // Try sync to server (skip local)
             if (type !== 'local') {
-              try {
-                await this.postAdminVideo({ language: lang, ...videoData });
-              } catch (e) {
-                // Offline is okay
-              }
+              try { await this.postAdminVideo({ language: lang, ...videoData }); } catch (e) { /* offline ok */ }
             }
-            
+
             // Reset form
-            $('#videoTitle').value = '';
-            $('#videoType').value = '';
-            $('#videoId').value = '';
-            $('#videoFile').value = '';
-            $('#videoFile').style.display = 'none';
+            $('#videoTitle').value = ''; $('#videoType').value = '';
+            $('#videoId').value = ''; $('#videoFile').value = ''; $('#videoFile').style.display = 'none';
             $('#videoNoteAdmin').value = '';
-            
-            // Refresh UI
+
+            // Refresh lists
             this.renderAdminVideoList();
-            
-            // Add to current assignments if dashboard is open
+
             if (this.assignments) {
               const assignment = {
-                id: videoData.id,
-                title,
-                language: lang,
-                source: videoData,
-                status: 'assigned',
-                assignedAt: new Date().toISOString().slice(0, 10),
-                isAdminAdded: true
+                id: videoData.id, title, language: lang, source: videoData, status: 'assigned',
+                assignedAt: new Date().toISOString().slice(0, 10), isAdminAdded: true
               };
-              
               this.assignments.push(assignment);
               this.renderDashboard(this.assignments);
             }
-            
+
             this.showToast('Training saved successfully');
           } catch (error) {
             console.error('Error saving video:', error);
@@ -1287,17 +808,15 @@
           }
         });
       }
-      
+
       // ====== CORE METHODS ======
       async loadDriverData() {
         let assignments = [];
         let history = [];
-        
-        // Show loading state
+
         $('#lobbyList').innerHTML = '';
         $('#lobbyEmpty').style.display = 'none';
-        
-        // Load data with timeout
+
         const softTimeout = new Promise(resolve => setTimeout(resolve, 1800));
         const loadPromise = (async () => {
           [assignments, history] = await Promise.all([
@@ -1305,25 +824,29 @@
             this.fetchHistory(this.driver.name, this.driver.truck)
           ]);
         })();
-        
+
         await Promise.race([loadPromise, softTimeout]);
-        
-        // If no assignments yet, try once more
-        if (!assignments.length) {
-          assignments = await this.fetchAssignmentsMerged();
-        }
-        
-        // Merge with history and render
-        this.assignments = this.mergeServerHistory(assignments, history);
+
+        if (!assignments.length) assignments = await this.fetchAssignmentsMerged();
+
+        // Merge, filter demos, and render
+        this.assignments = this.mergeServerHistory(assignments, history).filter(a => {
+          const id = (a?.id || '').trim();
+          const title = (a?.title || '').trim();
+          return !DEMO_IDS.has(id) && !DEMO_TITLES.has(title);
+        });
         this.hydrateLocalWatchedFromServer(history);
         this.renderDashboard(this.assignments);
-        
-        // Final merge after all data is loaded
-        await loadPromise;
-        this.assignments = this.mergeServerHistory(assignments, history);
+
+        await loadPromise; // ensure full data loaded
+        this.assignments = this.mergeServerHistory(assignments, history).filter(a => {
+          const id = (a?.id || '').trim();
+          const title = (a?.title || '').trim();
+          return !DEMO_IDS.has(id) && !DEMO_TITLES.has(title);
+        });
         this.renderDashboard(this.assignments);
       }
-      
+
       async startAssignment(assignment) {
         this.currentAssignment = assignment;
         this.maxAllowedTime = 0;
@@ -1332,11 +855,10 @@
         this.selectedLang = assignment.language || this.selectedLang || 'English';
         localStorage.setItem(CONFIG.STORAGE_KEYS.LANGUAGE, this.selectedLang);
         this.applyTranslations(this.selectedLang);
-        
+
         this.startTime = new Date();
         this.rowId = '';
-        
-        // Log course start (unless admin preview)
+
         if (CONFIG.LOG_COURSE_STARTED && !this.isAdminViewing) {
           try {
             const res = await this.postTrainingEvent({
@@ -1348,203 +870,116 @@
               status: 'Course Started',
               assignmentId: assignment.id
             });
-            
             if (res?.row) this.rowId = res.row;
-          } catch (e) {
-            // Queued for later sync
-          }
+          } catch (e) { /* queued */ }
         }
-        
-        // Show video section
+
         $('#dashboardSection').classList.remove('active');
         $('#videoSection').classList.add('active');
         $('#activeVideoTitle').textContent = assignment.title;
         this.showLoadingNote(true);
-        
-        // Get video metadata
+
         const vmap = this.getVideoLinks();
         const meta = (vmap[this.selectedLang] || []).find(v => v.id === assignment.id) || assignment.source || {};
-        
-        // Render player
         this.renderPlayer(meta);
       }
-      
+
       renderPlayer(meta) {
         const type = meta.type;
         $('#videoContainer').innerHTML = '';
         $('#completionSection').style.display = 'none';
-        
+
         if (type === 'youtube') {
           const videoId = meta.videoId;
           $('#videoContainer').innerHTML = '<div id="ytPlayer"></div>';
-          
           const initPlayer = () => {
             this.ytPlayer = new YT.Player('ytPlayer', {
-              videoId,
-              width: '100%',
-              height: '100%',
-              playerVars: {
-                controls: 1,
-                disablekb: 1,
-                fs: 0,
-                modestbranding: 1,
-                rel: 0,
-                iv_load_policy: 3,
-                playsinline: 1
-              },
-              events: {
-                onReady: this.onYTReady.bind(this),
-                onStateChange: this.onYTStateChange.bind(this)
-              }
+              videoId, width: '100%', height: '100%',
+              playerVars: { controls: 1, disablekb: 1, fs: 0, modestbranding: 1, rel: 0, iv_load_policy: 3, playsinline: 1 },
+              events: { onReady: this.onYTReady.bind(this), onStateChange: this.onYTStateChange.bind(this) }
             });
           };
-
-          if (window.YT && window.YT.Player) {
-            initPlayer();
-          } else if (!window._ytReadyHooked) {
-            window._ytReadyHooked = true;
-            window.onYouTubeIframeAPIReady = () => initPlayer();
-          }
-        } 
+          if (window.YT && window.YT.Player) { initPlayer(); }
+          else if (!window._ytReadyHooked) { window._ytReadyHooked = true; window.onYouTubeIframeAPIReady = () => initPlayer(); }
+        }
         else if (type === 'mp4') {
           const url = meta.url;
           $('#videoContainer').innerHTML = `
-            <video id="trainingVideo" controls controlsList="nodownload noplaybackrate" 
-                   disablepictureinpicture playsinline></video>
-          `;
-          
+            <video id="trainingVideo" controls controlsList="nodownload noplaybackrate"
+                   disablepictureinpicture playsinline></video>`;
           const video = $('#trainingVideo');
           video.src = url;
-          
           video.addEventListener('loadeddata', () => this.showLoadingNote(false), { once: true });
           video.addEventListener('canplay', () => this.showLoadingNote(false), { once: true });
-          
           video.playbackRate = 1;
-          video.addEventListener('ratechange', () => {
-            if (video.playbackRate !== 1) video.playbackRate = 1;
-          });
-          
+          video.addEventListener('ratechange', () => { if (video.playbackRate !== 1) video.playbackRate = 1; });
           video.addEventListener('seeking', () => {
-            if (video.currentTime > this.maxAllowedTime + CONFIG.ALLOW_SEEK_TOLERANCE) {
-              video.currentTime = this.maxAllowedTime;
-            }
+            if (video.currentTime > this.maxAllowedTime + CONFIG.ALLOW_SEEK_TOLERANCE) video.currentTime = this.maxAllowedTime;
           });
-          
           video.addEventListener('timeupdate', () => {
-            if (video.currentTime > this.maxAllowedTime) {
-              this.maxAllowedTime = video.currentTime;
-            }
-            
+            if (video.currentTime > this.maxAllowedTime) this.maxAllowedTime = video.currentTime;
             this.watchedSeconds = Math.max(this.watchedSeconds, Math.floor(this.maxAllowedTime));
-            
-            if (!this.minReached && this.watchedSeconds >= CONFIG.MIN_WATCH_SECONDS) {
-              this.minReached = true;
-              $('#completionSection').style.display = 'block';
-            }
-            
+            if (!this.minReached && this.watchedSeconds >= CONFIG.MIN_WATCH_SECONDS) { this.minReached = true; $('#completionSection').style.display = 'block'; }
             const remaining = video.duration - video.currentTime;
-            if (remaining <= CONFIG.REVEAL_BEFORE_END) {
-              $('#completionSection').style.display = 'block';
-            }
+            if (remaining <= CONFIG.REVEAL_BEFORE_END) $('#completionSection').style.display = 'block';
           });
-          
           video.addEventListener('ended', () => this.autoComplete());
-          
-          video.play().catch(() => {
-            this.showToast('Tap play to start the video');
-          });
-        } 
+          video.play().catch(() => { this.showToast('Tap play to start the video'); });
+        }
         else if (type === 'drive') {
           const fid = meta.driveId;
           const src = `https://drive.google.com/file/d/${fid}/preview`;
           const iframe = document.createElement('iframe');
-          iframe.src = src;
-          iframe.allow = 'autoplay; encrypted-media';
-          iframe.allowFullscreen = true;
+          iframe.src = src; iframe.allow = 'autoplay; encrypted-media'; iframe.allowFullscreen = true;
           iframe.onload = () => this.showLoadingNote(false);
           $('#videoContainer').appendChild(iframe);
-          
-          // For Drive videos, we can't track time precisely, so use a timer
+
           let seconds = 0;
           const timer = setInterval(() => {
-            seconds++;
-            this.watchedSeconds = Math.max(this.watchedSeconds, seconds);
-            
+            seconds++; this.watchedSeconds = Math.max(this.watchedSeconds, seconds);
             if (!this.minReached && seconds >= CONFIG.MIN_WATCH_SECONDS) {
-              this.minReached = true;
-              $('#completionSection').style.display = 'block';
-              clearInterval(timer);
+              this.minReached = true; $('#completionSection').style.display = 'block'; clearInterval(timer);
             }
           }, 1000);
-        } 
+        }
         else if (type === 'local') {
           this.idbGetUrl(meta.localKey).then(url => {
-            if (!url) {
-              this.showLoadingNote(false);
-              this.showToast('Local file missing on this device');
-              return;
-            }
-            
+            if (!url) { this.showLoadingNote(false); this.showToast('Local file missing on this device'); return; }
             this.currentObjectUrl = url;
-
             $('#videoContainer').innerHTML = `
-              <video id="trainingVideo" controls controlsList="nodownload noplaybackrate" 
-                     disablepictureinpicture playsinline></video>
-            `;
-            
+              <video id="trainingVideo" controls controlsList="nodownload noplaybackrate"
+                     disablepictureinpicture playsinline></video>`;
             const video = $('#trainingVideo');
             video.src = url;
-            
             video.addEventListener('loadeddata', () => this.showLoadingNote(false), { once: true });
             video.addEventListener('canplay', () => this.showLoadingNote(false), { once: true });
-            
             video.playbackRate = 1;
-            video.addEventListener('ratechange', () => {
-              if (video.playbackRate !== 1) video.playbackRate = 1;
-            });
-            
+            video.addEventListener('ratechange', () => { if (video.playbackRate !== 1) video.playbackRate = 1; });
             video.addEventListener('seeking', () => {
-              if (video.currentTime > this.maxAllowedTime + CONFIG.ALLOW_SEEK_TOLERANCE) {
-                video.currentTime = this.maxAllowedTime;
-              }
+              if (video.currentTime > this.maxAllowedTime + CONFIG.ALLOW_SEEK_TOLERANCE) video.currentTime = this.maxAllowedTime;
             });
-            
             video.addEventListener('timeupdate', () => {
-              if (video.currentTime > this.maxAllowedTime) {
-                this.maxAllowedTime = video.currentTime;
-              }
-              
+              if (video.currentTime > this.maxAllowedTime) this.maxAllowedTime = video.currentTime;
               this.watchedSeconds = Math.max(this.watchedSeconds, Math.floor(this.maxAllowedTime));
-              
-              if (!this.minReached && this.watchedSeconds >= CONFIG.MIN_WATCH_SECONDS) {
-                this.minReached = true;
-                $('#completionSection').style.display = 'block';
-              }
-              
+              if (!this.minReached && this.watchedSeconds >= CONFIG.MIN_WATCH_SECONDS) { this.minReached = true; $('#completionSection').style.display = 'block'; }
               const remaining = video.duration - video.currentTime;
-              if (remaining <= CONFIG.REVEAL_BEFORE_END) {
-                $('#completionSection').style.display = 'block';
-              }
+              if (remaining <= CONFIG.REVEAL_BEFORE_END) $('#completionSection').style.display = 'block';
             });
-            
             video.addEventListener('ended', () => this.autoComplete());
-            
-            video.play().catch(() => {
-              this.showToast('Tap play to start the video');
-            });
+            video.play().catch(() => { this.showToast('Tap play to start the video'); });
           });
-        } 
+        }
         else {
           this.showLoadingNote(false);
           this.showToast('Video source missing');
         }
       }
-      
+
       async submitCompletion() {
         const end = new Date();
         const ms = end - this.startTime;
         const durationMin = Math.max(1, Math.round(ms / 60000));
-        
+
         const payload = {
           op: 'complete',
           name: this.driver.name,
@@ -1556,16 +991,10 @@
           assignmentId: this.currentAssignment?.id,
           updateRowId: this.rowId || ''
         };
-        
+
         let ok = true;
-        
-        try {
-          await this.postTrainingEvent(payload);
-        } catch (e) {
-          ok = false;
-        }
-        
-        // Mark as watched locally
+        try { await this.postTrainingEvent(payload); } catch (e) { ok = false; }
+
         if (this.currentAssignment?.id) {
           this.markWatched(this.currentAssignment.id, {
             completedAt: new Date().toISOString().slice(0, 10),
@@ -1573,8 +1002,7 @@
             language: this.selectedLang
           });
         }
-        
-        // Update assignments list
+
         if (this.assignments && this.currentAssignment) {
           const idx = this.assignments.findIndex(a => a.id === this.currentAssignment.id);
           if (idx > -1) {
@@ -1584,232 +1012,149 @@
             this.assignments[idx].language = this.selectedLang;
           }
         }
-        
-        // Show completion message
+
         const t = this.getTranslations()[this.selectedLang] || TRANSLATIONS.English;
         this.showToast(t.complete);
         $('#videoContainer').innerHTML = '';
-        
-        // Return to dashboard after delay
+
         setTimeout(() => {
           $('#videoSection').classList.remove('active');
           $('#dashboardSection').classList.add('active');
           $('#completionSection').style.display = 'none';
-          this.isAdminViewing = false; // Reset admin preview flag
+          this.isAdminViewing = false;
           this.renderDashboard(this.assignments || []);
           this.applyTranslations(this.selectedLang);
         }, 700);
-        
-        if (!ok) {
-          this.showToast('Saved offline. Will sync when you tap "Sync Pending".');
-        }
+
+        if (!ok) this.showToast('Saved offline. Will sync when you tap "Sync Pending".');
       }
-      
+
       closeVideoPlayer() {
         clearInterval(this.progressPoll);
-        
-        if (this.ytPlayer) {
-          try {
-            this.ytPlayer.destroy();
-          } catch (e) {
-            console.error('Error destroying YT player:', e);
-          }
-          this.ytPlayer = null;
-        }
-
-        if (this.currentObjectUrl) {
-          try { URL.revokeObjectURL(this.currentObjectUrl); } catch (_) {}
-          this.currentObjectUrl = '';
-        }
-        
+        if (this.ytPlayer) { try { this.ytPlayer.destroy(); } catch (e) {} this.ytPlayer = null; }
+        if (this.currentObjectUrl) { try { URL.revokeObjectURL(this.currentObjectUrl); } catch (_) {} this.currentObjectUrl = ''; }
         $('#videoSection').classList.remove('active');
-        
-        if (this.isAdminViewing) {
-          $('#adminPanelSection').classList.add('active');
-        } else {
-          $('#dashboardSection').classList.add('active');
-        }
-        
+        if (this.isAdminViewing) { $('#adminPanelSection').classList.add('active'); } else { $('#dashboardSection').classList.add('active'); }
         $('#completionSection').style.display = 'none';
         $('#videoContainer').innerHTML = '';
         this.showLoadingNote(false);
         this.applyTranslations(this.selectedLang);
         this.isAdminViewing = false;
       }
-      
-      // ====== YOUTUBE PLAYER EVENTS ======
+
+      // ====== YOUTUBE EVENTS ======
       onYTReady(event) {
         this.showLoadingNote(false);
-        
-        try {
-          event.target.setPlaybackRate(1);
-        } catch (e) {
-          console.error('Error setting playback rate:', e);
-        }
-        
+        try { event.target.setPlaybackRate(1); } catch (e) {}
         event.target.playVideo();
-        
+
         clearInterval(this.progressPoll);
         this.progressPoll = setInterval(() => {
           if (!this.ytPlayer) return;
-          
           const currentTime = this.ytPlayer.getCurrentTime();
           const duration = this.ytPlayer.getDuration();
-          
-          if (currentTime > this.maxAllowedTime) {
-            this.maxAllowedTime = currentTime;
-          }
-          
-          if (currentTime > this.maxAllowedTime + CONFIG.ALLOW_SEEK_TOLERANCE) {
-            this.ytPlayer.seekTo(this.maxAllowedTime, true);
-          }
-          
+          if (currentTime > this.maxAllowedTime) this.maxAllowedTime = currentTime;
+          if (currentTime > this.maxAllowedTime + CONFIG.ALLOW_SEEK_TOLERANCE) this.ytPlayer.seekTo(this.maxAllowedTime, true);
           this.watchedSeconds = Math.max(this.watchedSeconds, Math.floor(this.maxAllowedTime));
-          
-          if (!this.minReached && this.watchedSeconds >= CONFIG.MIN_WATCH_SECONDS) {
-            this.minReached = true;
-            $('#completionSection').style.display = 'block';
-          }
-          
-          if (duration && (duration - currentTime) <= CONFIG.REVEAL_BEFORE_END) {
-            $('#completionSection').style.display = 'block';
-          }
-          
-          try {
-            if (this.ytPlayer.getPlaybackRate && this.ytPlayer.getPlaybackRate() !== 1) {
-              this.ytPlayer.setPlaybackRate(1);
-            }
-          } catch (e) {
-            console.error('Error checking playback rate:', e);
-          }
+          if (!this.minReached && this.watchedSeconds >= CONFIG.MIN_WATCH_SECONDS) { this.minReached = true; $('#completionSection').style.display = 'block'; }
+          if (duration && (duration - currentTime) <= CONFIG.REVEAL_BEFORE_END) $('#completionSection').style.display = 'block';
+          try { if (this.ytPlayer.getPlaybackRate && this.ytPlayer.getPlaybackRate() !== 1) this.ytPlayer.setPlaybackRate(1); } catch (e) {}
         }, 500);
       }
-      
+
       onYTStateChange(event) {
         const YT_ENDED = 0;
-        if (event.data === YT_ENDED) {
-          this.autoComplete();
-        }
+        if (event.data === YT_ENDED) this.autoComplete();
       }
-      
+
       autoComplete() {
         if (!this.minReached && this.watchedSeconds < CONFIG.MIN_WATCH_SECONDS) {
           $('#completionSection').style.display = 'block';
           return;
         }
-        
         this.submitCompletion();
       }
-      
+
       // ====== UI METHODS ======
       showLoadingNote(show) {
         const t = this.getTranslations()[this.selectedLang] || TRANSLATIONS.English;
         $('#videoNote').style.display = show ? 'block' : 'none';
-        
-        if (show) {
-          $('#videoNote').textContent = t.loadingVideo || 'Loading video, please wait...';
-        }
+        if (show) $('#videoNote').textContent = t.loadingVideo || 'Loading video, please wait...';
       }
-      
+
       showToast(message, duration = 3000) {
         const toast = $('#toast');
         toast.textContent = message;
         toast.style.display = 'block';
-        
-        setTimeout(() => {
-          toast.style.display = 'none';
-        }, duration);
+        setTimeout(() => { toast.style.display = 'none'; }, duration);
       }
-      
+
       setActiveTab(tabName) {
-        document.querySelectorAll('.tab').forEach(tab => {
-          tab.classList.toggle('active', tab.dataset.tab === tabName);
-        });
-        
-        document.querySelectorAll('.tabpanel').forEach(panel => {
-          panel.style.display = panel.id === tabName ? 'block' : 'none';
-        });
+        document.querySelectorAll('.tab').forEach(tab => { tab.classList.toggle('active', tab.dataset.tab === tabName); });
+        document.querySelectorAll('.tabpanel').forEach(panel => { panel.style.display = panel.id === tabName ? 'block' : 'none'; });
       }
-      
+
       populateLanguageSelect() {
         const tmap = this.getTranslations();
         const t = tmap[this.selectedLang] || TRANSLATIONS.English;
         const opts = Object.keys(tmap);
-        
+
         $('#languageSelect').innerHTML = `
           <option value="">${t.choose || '-- Choose a Language --'}</option>
           ${opts.map(lang => `<option value="${lang}">${lang}</option>`).join('')}
         `;
-        
         $('#languageSelect').value = this.selectedLang;
       }
-      
+
       populateAdminLangSelect() {
         const tmap = this.getTranslations();
         const opts = Object.keys(tmap);
-        
         $('#adminLangSelect').innerHTML = `
           <option value="">-- Select Language --</option>
           ${opts.map(lang => `<option value="${lang}">${lang}</option>`).join('')}
         `;
       }
-      
+
       applyTranslations(lang) {
-  const t = this.getTranslations()[lang] || TRANSLATIONS.English;
+        const t = this.getTranslations()[lang] || TRANSLATIONS.English;
+        document.documentElement.lang = t.code || 'en';
+        document.documentElement.dir = t.dir || 'ltr';
+        document.title = t.pageTitle;
 
-  // Set document language and direction
-  document.documentElement.lang = t.code || 'en';
-  document.documentElement.dir = t.dir || 'ltr';
+        $('#langTitle').textContent = t.langTitle;
+        const emptyOpt = $('#languageSelect').querySelector('option[value=""]');
+        if (emptyOpt) emptyOpt.textContent = t.choose;
 
-  // Update page title
-  document.title = t.pageTitle;
+        const contBtn = $('#continueBtn'); if (contBtn) contBtn.textContent = t.continue;
+        const adminBtn = $('#adminLoginBtn'); if (adminBtn) adminBtn.textContent = t.adminLogin || 'Admin Login';
 
-  // Language selection
-  $('#langTitle').textContent = t.langTitle;
-  const emptyOpt = $('#languageSelect').querySelector('option[value=""]');
-  if (emptyOpt) emptyOpt.textContent = t.choose;
+        $('#formTitle').textContent = t.formTitle;
+        $('#name').placeholder = t.name;
+        $('#truck').placeholder = t.truck;
+        $('#submitBtn').textContent = t.submit;
+        $('#backBtn').textContent = t.back;
 
-  // ✅ translate language screen buttons
-  const contBtn = $('#continueBtn');
-  if (contBtn) contBtn.textContent = t.continue; // e.g. "Endelea" in Swahili
+        $('#dashTitle').textContent = t.dash;
+        $('#tabLobby').textContent = t.lobby;
+        $('#tabHistory').textContent = t.history;
+        $('#syncBtn').textContent = t.sync;
+        $('#changeDriverBtn').textContent = t.change;
+        $('#lobbyEmpty').textContent = t.noPending;
+        $('#historyEmpty').textContent = t.noHistory;
 
-  const adminBtn = $('#adminLoginBtn');
-if (adminBtn) adminBtn.textContent = t.adminLogin || 'Admin Login';
+        $('#closeBtn').textContent = t.cancel;
+        const completeBtn = $('#completeBtn'); if (completeBtn) completeBtn.textContent = t.complete;
 
-  // Check-in form
-  $('#formTitle').textContent = t.formTitle;
-  $('#name').placeholder = t.name;
-  $('#truck').placeholder = t.truck;
-  $('#submitBtn').textContent = t.submit;
-  $('#backBtn').textContent = t.back;
+        $('#sortBtn').textContent = `${t.sort}: ${this.lobbySort === 'recent' ? t.recent : t.oldest}`;
+      }
 
-  // Dashboard
-  $('#dashTitle').textContent = t.dash;
-  $('#tabLobby').textContent = t.lobby;
-  $('#tabHistory').textContent = t.history;
-  $('#syncBtn').textContent = t.sync;
-  $('#changeDriverBtn').textContent = t.change;
-  $('#lobbyEmpty').textContent = t.noPending;
-  $('#historyEmpty').textContent = t.noHistory;
-
-  // Video player
-  $('#closeBtn').textContent = t.cancel;
-  const completeBtn = $('#completeBtn');
-  if (completeBtn) completeBtn.textContent = t.complete;
-
-  // Sort button
-  $('#sortBtn').textContent = `${t.sort}: ${this.lobbySort === 'recent' ? t.recent : t.oldest}`;
-}
-      
       renderDashboard(assignments) {
         this.assignments = assignments;
         const t = this.getTranslations()[this.selectedLang] || TRANSLATIONS.English;
         const watched = this.loadDriverState().watched || {};
-        
-        // Filter assignments for current language
+
         const inLang = assignments.filter(a => (a.language || this.selectedLang) === this.selectedLang);
-        
-        // Update status based on watched state
+
         inLang.forEach(a => {
           if (watched[a.id]?.done) {
             a.status = 'completed';
@@ -1817,8 +1162,7 @@ if (adminBtn) adminBtn.textContent = t.adminLogin || 'Admin Login';
             a.duration = a.duration || watched[a.id].duration;
           }
         });
-        
-        // Pending assignments
+
         const pending = inLang.filter(a => a.status !== 'completed');
         pending.sort((a, b) => {
           const da = Date.parse(a.assignedAt || '');
@@ -1827,37 +1171,28 @@ if (adminBtn) adminBtn.textContent = t.adminLogin || 'Admin Login';
           const vb = isNaN(db) ? (this.lobbySort === 'recent' ? -Infinity : Infinity) : db;
           return this.lobbySort === 'recent' ? (vb - va) : (va - vb);
         });
-        
+
         $('#lobbyList').innerHTML = '';
         $('#lobbyEmpty').style.display = pending.length ? 'none' : 'block';
-        
-        pending.forEach(a => {
-          $('#lobbyList').appendChild(this.createAssignmentCard(a, true, t));
-        });
-        
-        // Completed assignments
+        pending.forEach(a => { $('#lobbyList').appendChild(this.createAssignmentCard(a, true, t)); });
+
         const done = inLang.filter(a => a.status === 'completed');
         done.sort((a, b) => Date.parse(b.completedAt || 0) - Date.parse(a.completedAt || 0));
-        
+
         $('#historyList').innerHTML = '';
         $('#historyEmpty').style.display = done.length ? 'none' : 'block';
-        
-        done.forEach(a => {
-          $('#historyList').appendChild(this.createAssignmentCard(a, false, t));
-        });
+        done.forEach(a => { $('#historyList').appendChild(this.createAssignmentCard(a, false, t)); });
       }
-      
+
       createAssignmentCard(assignment, withPlay, t) {
         const card = document.createElement('div');
         card.className = 'card';
-        
-        const localOnly = assignment.source?.type === 'local' ? 
-          `<span class="local-only">${t.localOnly}</span>` : '';
-        
-        const when = assignment.status === 'completed' ?
-          (assignment.completedAt ? ` • ${assignment.completedAt}` : '') :
-          (assignment.assignedAt ? ` • ${t.assigned} ${assignment.assignedAt}` : '');
-        
+
+        const localOnly = assignment.source?.type === 'local' ? `<span class="local-only">${t.localOnly}</span>` : '';
+        const when = assignment.status === 'completed'
+          ? (assignment.completedAt ? ` • ${assignment.completedAt}` : '')
+          : (assignment.assignedAt ? ` • ${t.assigned} ${assignment.assignedAt}` : '');
+
         card.innerHTML = `
           <div class="card-body">
             <div class="flex justify-between items-start">
@@ -1867,45 +1202,39 @@ if (adminBtn) adminBtn.textContent = t.adminLogin || 'Admin Login';
             <p class="text-sm text-muted mt-2">
               ${t.status}: <span class="font-medium">${assignment.status}</span>${when}
             </p>
-            ${withPlay ? '' : (assignment.duration ? `
-              <p class="text-sm text-muted mt-2">${t.duration}: ${assignment.duration}</p>
-            ` : '')}
+            ${withPlay ? '' : (assignment.duration ? `<p class="text-sm text-muted mt-2">${t.duration}: ${assignment.duration}</p>` : '')}
           </div>
-          ${withPlay ? `
-            <div class="card-footer">
-              <button class="btn btn-primary btn-block">${t.play}</button>
-            </div>
-          ` : ''}
+          ${withPlay ? `<div class="card-footer"><button class="btn btn-primary btn-block">${t.play}</button></div>` : ''}
         `;
-        
+
         if (withPlay) {
           const btn = card.querySelector('button');
           btn.addEventListener('click', () => this.startAssignment(assignment));
         }
-        
         return card;
       }
-      
+
       renderAdminVideoList() {
         const vmap = this.getVideoLinks();
         const container = $('#adminVideoItems');
         container.innerHTML = '';
-        
+
         Object.entries(vmap).forEach(([lang, videos]) => {
+          // Filter out any lingering demos (extra safety)
+          videos = videos.filter(v => !DEMO_IDS.has((v.id || '').trim()) && !DEMO_TITLES.has((v.title || '').trim()));
           if (!videos.length) return;
-          
+
           const langHeader = document.createElement('h4');
           langHeader.className = 'mb-2';
           langHeader.textContent = lang;
           container.appendChild(langHeader);
-          
+
           videos.forEach(video => {
             const item = document.createElement('div');
             item.className = 'card mb-3';
-            
-            const localBadge = video.type === 'local' ? 
-              `<span class="local-only">${TRANSLATIONS.English.localOnly}</span>` : '';
-            
+
+            const localBadge = video.type === 'local' ? `<span class="local-only">${TRANSLATIONS.English.localOnly}</span>` : '';
+
             item.innerHTML = `
               <div class="card-body">
                 <div class="flex justify-between items-start">
@@ -1919,185 +1248,127 @@ if (adminBtn) adminBtn.textContent = t.adminLogin || 'Admin Login';
                 ${video.note ? `<p class="text-sm mt-2">${video.note}</p>` : ''}
               </div>
             `;
-            
+
             const playBtn = item.querySelector('.btn-muted');
             const deleteBtn = item.querySelector('.btn-danger');
-            
+
             playBtn.addEventListener('click', () => {
               this.isAdminViewing = true;
               const fakeAssignment = {
-                id: video.id,
-                title: video.title,
-                language: lang,
-                source: video,
-                status: 'assigned',
-                assignedAt: new Date().toISOString().slice(0, 10),
-                isAdminAdded: true
+                id: video.id, title: video.title, language: lang, source: video,
+                status: 'assigned', assignedAt: new Date().toISOString().slice(0, 10), isAdminAdded: true
               };
-              
               this.startAssignment(fakeAssignment);
             });
-            
+
             deleteBtn.addEventListener('click', async () => {
               if (!confirm('Delete this training? This cannot be undone.')) return;
-              
               const custom = this.loadCustomLangs();
               if (custom[lang]?.videos) {
                 custom[lang].videos = custom[lang].videos.filter(v => v.id !== video.id);
                 this.saveCustomLangs(custom);
-                
-                // Delete local file if exists
-                if (video.type === 'local' && video.localKey) {
-                  try {
-                    await this.idbDelete(video.localKey);
-                  } catch (e) {
-                    console.error('Error deleting local video:', e);
-                  }
-                }
-                
+                if (video.type === 'local' && video.localKey) { try { await this.idbDelete(video.localKey); } catch (e) {} }
                 this.renderAdminVideoList();
-                
-                // Update dashboard if open
                 if (this.assignments) {
                   this.assignments = this.assignments.filter(a => a.id !== video.id);
                   this.renderDashboard(this.assignments);
                 }
-                
                 this.showToast('Training deleted');
               }
             });
-            
+
             container.appendChild(item);
           });
         });
       }
-      
+
       showAdminPanel(show) {
         if (show && !this.isAdminLoggedIn()) return;
         $('#adminPanelBtn').style.display = show ? 'block' : 'none';
       }
-      
+
       // ====== DATA METHODS ======
       async loadDrivers() {
         try {
           const res = await fetch(`${CONFIG.BASE_URL}?mode=drivers`, { cache: 'no-store' });
-          
-          if (!res.ok) {
-            throw new Error(`HTTP ${res.status}`);
-          }
-          
+          if (!res.ok) throw new Error(`HTTP ${res.status}`);
           const data = await res.json();
           const datalist = $('#driverNames');
           datalist.innerHTML = '';
-          
           this.driverList = Array.isArray(data) ? data : [];
           this.driverList.forEach(driver => {
             const option = document.createElement('option');
             option.value = driver.name;
             datalist.appendChild(option);
           });
-        } catch (e) {
-          console.error('Failed to load drivers:', e);
-        }
+        } catch (e) { console.error('Failed to load drivers:', e); }
       }
-      
+
       async fetchAssignmentsMerged() {
         const vmap = this.getVideoLinks();
+
+        // Local videos for current language
         const localLangList = (vmap[this.selectedLang] || []).map(video => ({
-          id: video.id,
-          title: video.title,
-          language: this.selectedLang,
-          source: video,
-          status: 'assigned',
-          assignedAt: new Date().toISOString().slice(0, 10),
-          isAdminAdded: true
+          id: video.id, title: video.title, language: this.selectedLang, source: video,
+          status: 'assigned', assignedAt: new Date().toISOString().slice(0, 10), isAdminAdded: true
         }));
-        
-        // Try to fetch from server
+
+        // Server assignments
         let serverAssignments = [];
-        
         try {
           const res = await fetch(`${CONFIG.BASE_URL}?mode=assignments`, { cache: 'no-store' });
-          
           if (res.ok) {
             const data = await res.json();
-            
             if (Array.isArray(data.assignments)) {
               serverAssignments = data.assignments.map(a => {
-                if (!a.source && a.type) {
-                  a.source = { 
-                    type: a.type, 
-                    videoId: a.videoId, 
-                    url: a.url, 
-                    driveId: a.driveId 
-                  };
-                }
-                
-                if (!a.language) {
-                  a.language = this.selectedLang;
-                }
-                
+                if (!a.source && a.type) a.source = { type: a.type, videoId: a.videoId, url: a.url, driveId: a.driveId };
+                if (!a.language) a.language = this.selectedLang;
                 return a;
               });
             }
           }
-        } catch (e) {
-          console.error('Failed to fetch assignments:', e);
-        }
-        
-        // Merge and dedupe (prefer server fields)
+        } catch (e) { console.error('Failed to fetch assignments:', e); }
+
+        // Merge + dedupe
         const byId = new Map();
-        
-        [...serverAssignments, ...localLangList].forEach(a => {
-          if (!a) return;
-          byId.set(a.id, { ...a, ...(byId.get(a.id) || {}) });
-        });
-        
-        // Fallback: if nothing, load all local across languages
+        [...serverAssignments, ...localLangList].forEach(a => { if (a) byId.set(a.id, { ...a, ...(byId.get(a.id) || {}) }); });
+
+        // Fallback: load all local across languages if empty
         if (byId.size === 0) {
           Object.entries(vmap).forEach(([lang, videos]) => {
             videos.forEach(video => {
               byId.set(video.id, {
-                id: video.id,
-                title: video.title,
-                language: lang,
-                source: video,
-                status: 'assigned',
-                assignedAt: new Date().toISOString().slice(0, 10),
-                isAdminAdded: true
+                id: video.id, title: video.title, language: lang, source: video,
+                status: 'assigned', assignedAt: new Date().toISOString().slice(0, 10), isAdminAdded: true
               });
             });
           });
         }
-        
-        return Array.from(byId.values());
+
+        // FINAL FILTER: remove demo IDs/titles
+        return Array.from(byId.values()).filter(a => {
+          const id = (a?.id || '').trim();
+          const title = (a?.title || '').trim();
+          return !DEMO_IDS.has(id) && !DEMO_TITLES.has(title);
+        });
       }
-      
+
       async fetchHistory(name, truck) {
         try {
           const url = `${CONFIG.BASE_URL}?mode=history&name=${encodeURIComponent(name)}&truck=${encodeURIComponent(truck)}`;
           const res = await fetch(url, { cache: 'no-store' });
-          
-          if (!res.ok) {
-            throw new Error('Network error');
-          }
-          
+          if (!res.ok) throw new Error('Network error');
           const data = await res.json();
           return Array.isArray(data.history) ? data.history : [];
-        } catch (e) {
-          console.error('Failed to fetch history:', e);
-          return [];
-        }
+        } catch (e) { console.error('Failed to fetch history:', e); return []; }
       }
-      
+
       mergeServerHistory(assignments, history) {
         const byId = new Map(assignments.map(a => [a.id, a]));
-        
         history.forEach(record => {
           const key = record.assignmentId || record.id;
           if (!key) return;
           const existing = byId.get(key);
-          
           if (existing) {
             existing.status = 'completed';
             existing.completedAt = record.completedAt || existing.completedAt || new Date().toISOString().slice(0, 10);
@@ -2105,26 +1376,20 @@ if (adminBtn) adminBtn.textContent = t.adminLogin || 'Admin Login';
             existing.language = record.language || existing.language;
           } else {
             byId.set(key, {
-              id: key,
-              title: record.title || 'Completed Training',
-              language: record.language || this.selectedLang,
-              source: null,
-              status: 'completed',
-              completedAt: record.completedAt || new Date().toISOString().slice(0, 10),
+              id: key, title: record.title || 'Completed Training',
+              language: record.language || this.selectedLang, source: null,
+              status: 'completed', completedAt: record.completedAt || new Date().toISOString().slice(0, 10),
               duration: record.duration
             });
           }
         });
-        
         return Array.from(byId.values());
       }
-      
+
       hydrateLocalWatchedFromServer(history) {
         if (!history?.length) return;
-        
         const state = this.loadDriverState();
         state.watched = state.watched || {};
-        
         history.forEach(record => {
           const id = record.assignmentId || record.id;
           if (!id) return;
@@ -2135,319 +1400,192 @@ if (adminBtn) adminBtn.textContent = t.adminLogin || 'Admin Login';
             language: record.language
           };
         });
-        
         this.saveDriverState(state);
       }
-      
+
       async postTrainingEvent(payload) {
-        // Skip if admin preview or session start (when disabled)
         if (this.isAdminViewing) return { success: true, preview: true };
-        if (!CONFIG.LOG_COURSE_STARTED && payload.status === 'Course Started') {
-          return { success: true, skipped: true };
-        }
-        
+        if (!CONFIG.LOG_COURSE_STARTED && payload.status === 'Course Started') return { success: true, skipped: true };
+
         try {
           const formData = new FormData();
           formData.append('mode', 'event');
-          
-          Object.entries(payload).forEach(([key, value]) => {
-            formData.append(key, value ?? '');
-          });
-          
-          const res = await fetch(CONFIG.BASE_URL, {
-            method: 'POST',
-            body: formData
-          });
-          
+          Object.entries(payload).forEach(([k, v]) => formData.append(k, v ?? ''));
+          const res = await fetch(CONFIG.BASE_URL, { method: 'POST', body: formData });
           const data = await res.json();
-          
-          if (data.success === false) {
-            throw new Error(data.message || 'Server error');
-          }
-          
+          if (data.success === false) throw new Error(data.message || 'Server error');
           return data;
         } catch (e) {
-          // Only queue completion events (not course started)
-          if (payload.status === 'Completed') {
-            this.enqueuePendingEvent(payload);
-          }
-          
+          if (payload.status === 'Completed') this.enqueuePendingEvent(payload);
           throw e;
         }
       }
-      
+
       async postAdminVideo(videoData) {
         try {
           const formData = new FormData();
           formData.append('mode', 'admin_add_video');
-          
-          Object.entries(videoData).forEach(([key, value]) => {
-            formData.append(key, value ?? '');
-          });
-          
-          const res = await fetch(CONFIG.BASE_URL, {
-            method: 'POST',
-            body: formData
-          });
-          
+          Object.entries(videoData).forEach(([k, v]) => formData.append(k, v ?? ''));
+          const res = await fetch(CONFIG.BASE_URL, { method: 'POST', body: formData });
           const data = await res.json();
-          
-          if (data.success === false) {
-            throw new Error(data.message || 'Server error');
-          }
-          
+          if (data.success === false) throw new Error(data.message || 'Server error');
           return data;
         } catch (e) {
           console.log('Admin video saved locally (offline)', e);
           return { success: true, offline: true };
         }
       }
-      
+
       async flushPendingEvents() {
         const pending = this.pendingEvents();
-        
-        if (!pending.length) {
-          this.showToast('Nothing to sync');
-          return;
-        }
-        
+        if (!pending.length) { this.showToast('Nothing to sync'); return; }
+
         const remaining = [];
-        
         for (const event of pending) {
-          try {
-            await this.postTrainingEvent(event);
-          } catch (e) {
-            remaining.push(event);
-          }
+          try { await this.postTrainingEvent(event); } catch (e) { remaining.push(event); }
         }
-        
         this.savePendingEvents(remaining);
-        
-        if (remaining.length) {
-          this.showToast(`Some items could not sync (${remaining.length})`);
-        } else {
-          this.showToast('All pending items synced');
-        }
+        if (remaining.length) this.showToast(`Some items could not sync (${remaining.length})`);
+        else this.showToast('All pending items synced');
       }
-      
-      // ====== LOCAL STORAGE METHODS ======
+
+      // ====== LOCAL STORAGE ======
       loadCustomLangs() {
-        try {
-          return JSON.parse(localStorage.getItem(CONFIG.STORAGE_KEYS.CUSTOM_LANGS) || '{}');
-        } catch {
-          return {};
-        }
+        try { return JSON.parse(localStorage.getItem(CONFIG.STORAGE_KEYS.CUSTOM_LANGS) || '{}'); }
+        catch { return {}; }
       }
-      
-      saveCustomLangs(data) {
-        localStorage.setItem(CONFIG.STORAGE_KEYS.CUSTOM_LANGS, JSON.stringify(data || {}));
-      }
-      
+      saveCustomLangs(data) { localStorage.setItem(CONFIG.STORAGE_KEYS.CUSTOM_LANGS, JSON.stringify(data || {})); }
+
       getTranslations() {
         const custom = this.loadCustomLangs();
         const translations = { ...TRANSLATIONS };
-        
         Object.entries(custom).forEach(([lang, data]) => {
-          if (data.translations) {
-            translations[lang] = { ...TRANSLATIONS.English, ...data.translations };
-          }
+          if (data.translations) translations[lang] = { ...TRANSLATIONS.English, ...data.translations };
         });
-        
         return translations;
       }
-      
+
       getVideoLinks() {
         const custom = this.loadCustomLangs();
-       const links = {};
-        
+        const links = {};
         Object.entries(custom).forEach(([lang, data]) => {
-          if (data.videos && Array.isArray(data.videos)) {
-            links[lang] = (links[lang] || []).concat(data.videos);
-          }
+          if (data.videos && Array.isArray(data.videos)) links[lang] = (links[lang] || []).concat(data.videos);
         });
-        
         return links;
       }
-      
+
       setVideoLinksForLang(lang, videos) {
         const custom = this.loadCustomLangs();
         custom[lang] = custom[lang] || { translations: {}, videos: [] };
         custom[lang].videos = videos;
         this.saveCustomLangs(custom);
       }
-      
+
       pendingEvents() {
-        try {
-          return JSON.parse(localStorage.getItem(CONFIG.STORAGE_KEYS.PENDING_EVENTS) || '[]');
-        } catch {
-          return [];
-        }
+        try { return JSON.parse(localStorage.getItem(CONFIG.STORAGE_KEYS.PENDING_EVENTS) || '[]'); }
+        catch { return []; }
       }
-      
-      savePendingEvents(events) {
-        localStorage.setItem(CONFIG.STORAGE_KEYS.PENDING_EVENTS, JSON.stringify(events || []));
-      }
-      
-      enqueuePendingEvent(event) {
-        const pending = this.pendingEvents();
-        pending.push(event);
-        this.savePendingEvents(pending);
-      }
-      
-      isAdminLoggedIn() {
-        return localStorage.getItem(CONFIG.STORAGE_KEYS.ADMIN_AUTH) === 'true';
-      }
-      
-      setAdminLoggedIn(status) {
-        localStorage.setItem(CONFIG.STORAGE_KEYS.ADMIN_AUTH, status ? 'true' : '');
-      }
-      
-      driverKey() {
-        return `${this.driver.name}|${this.driver.truck}`.toLowerCase().trim();
-      }
-      
-      driverStateKey() {
-        return CONFIG.STORAGE_KEYS.DRIVER_STATE + encodeURIComponent(this.driverKey());
-      }
-      
+      savePendingEvents(events) { localStorage.setItem(CONFIG.STORAGE_KEYS.PENDING_EVENTS, JSON.stringify(events || [])); }
+      enqueuePendingEvent(event) { const pending = this.pendingEvents(); pending.push(event); this.savePendingEvents(pending); }
+
+      isAdminLoggedIn() { return localStorage.getItem(CONFIG.STORAGE_KEYS.ADMIN_AUTH) === 'true'; }
+      setAdminLoggedIn(status) { localStorage.setItem(CONFIG.STORAGE_KEYS.ADMIN_AUTH, status ? 'true' : ''); }
+
+      driverKey() { return `${this.driver.name}|${this.driver.truck}`.toLowerCase().trim(); }
+      driverStateKey() { return CONFIG.STORAGE_KEYS.DRIVER_STATE + encodeURIComponent(this.driverKey()); }
       loadDriverState() {
-        try {
-          return JSON.parse(localStorage.getItem(this.driverStateKey()) || '{}');
-        } catch {
-          return {};
-        }
+        try { return JSON.parse(localStorage.getItem(this.driverStateKey()) || '{}'); }
+        catch { return {}; }
       }
-      
-      saveDriverState(state) {
-        localStorage.setItem(this.driverStateKey(), JSON.stringify(state || {}));
-      }
-      
+      saveDriverState(state) { localStorage.setItem(this.driverStateKey(), JSON.stringify(state || {})); }
       markWatched(assignmentId, extra = {}) {
         const state = this.loadDriverState();
         state.watched = state.watched || {};
         state.watched[assignmentId] = { done: true, ...extra };
         this.saveDriverState(state);
       }
-      
-      // ====== INDEXEDDB METHODS ======
+
+      // ====== INDEXEDDB ======
       async idbPut(key, blob) {
         const db = await this.openDb();
-        
         return new Promise((resolve, reject) => {
           const tx = db.transaction(CONFIG.DB_STORE, 'readwrite');
           tx.objectStore(CONFIG.DB_STORE).put(blob, key);
-          
           tx.oncomplete = () => resolve(true);
           tx.onerror = () => reject(tx.error);
         });
       }
-      
+
       async idbGetUrl(key) {
         const db = await this.openDb();
-        
         return new Promise((resolve, reject) => {
           const tx = db.transaction(CONFIG.DB_STORE, 'readonly');
           const req = tx.objectStore(CONFIG.DB_STORE).get(key);
-          
           req.onsuccess = () => {
             const blob = req.result;
             if (!blob) return resolve('');
             const url = URL.createObjectURL(blob);
             resolve(url);
           };
-          
           req.onerror = () => reject(req.error);
         });
       }
-      
+
       async idbDelete(key) {
         const db = await this.openDb();
-        
         return new Promise((resolve, reject) => {
           const tx = db.transaction(CONFIG.DB_STORE, 'readwrite');
           tx.objectStore(CONFIG.DB_STORE).delete(key);
-          
           tx.oncomplete = () => resolve(true);
           tx.onerror = () => reject(tx.error);
         });
       }
-      
+
       openDb() {
         return new Promise((resolve, reject) => {
           const req = indexedDB.open(CONFIG.DB_NAME, 1);
-          
-          req.onupgradeneeded = (e) => {
-            e.target.result.createObjectStore(CONFIG.DB_STORE);
-          };
-          
+          req.onupgradeneeded = (e) => { e.target.result.createObjectStore(CONFIG.DB_STORE); };
           req.onsuccess = () => resolve(req.result);
           req.onerror = () => reject(req.error);
         });
       }
-      
-      // ====== UTILITY METHODS ======
-      generateId() {
-        return 'vid-' + Date.now().toString(36) + Math.random().toString(36).substring(2, 6);
-      }
-      
+
+      // ====== UTILS ======
+      generateId() { return 'vid-' + Date.now().toString(36) + Math.random().toString(36).substring(2, 6); }
+
       parseYouTubeId(input) {
         const idRegex = /^[a-zA-Z0-9_-]{11}$/;
         if (idRegex.test(input)) return input;
-        
         try {
           const url = new URL(input);
-          
           if (url.hostname.includes('youtube.com')) {
-            if (url.pathname.startsWith('/watch')) {
-              return url.searchParams.get('v') || '';
-            }
-            
-            if (url.pathname.startsWith('/embed/')) {
-              return url.pathname.split('/embed/')[1] || '';
-            }
-            
-            if (url.pathname.startsWith('/shorts/')) {
-              return url.pathname.split('/shorts/')[1] || '';
-            }
+            if (url.pathname.startsWith('/watch')) return url.searchParams.get('v') || '';
+            if (url.pathname.startsWith('/embed/')) return url.pathname.split('/embed/')[1] || '';
+            if (url.pathname.startsWith('/shorts/')) return url.pathname.split('/shorts/')[1] || '';
           }
-          
-          if (url.hostname === 'youtu.be') {
-            return url.pathname.replace('/', '');
-          }
-        } catch {
-          return '';
-        }
-        
+          if (url.hostname === 'youtu.be') return url.pathname.replace('/', '');
+        } catch { return ''; }
         return '';
       }
-      
+
       extractDriveFileId(url) {
         try {
           const u = new URL(url);
-          
           if (u.hostname.includes('drive.google.com')) {
             const match = u.pathname.match(/\/file\/d\/([^/]+)/);
             if (match) return match[1];
-            
             const id = u.searchParams.get('id');
             if (id) return id;
           }
-        } catch {
-          return '';
-        }
-        
+        } catch { return ''; }
         return '';
       }
     }
 
-    // Initialize the app when DOM is loaded
+    // Initialize
     document.addEventListener('DOMContentLoaded', () => {
       window.app = new DriverTrainingApp();
     });
   </script>
 </body>
 </html>
-
-
-
-
