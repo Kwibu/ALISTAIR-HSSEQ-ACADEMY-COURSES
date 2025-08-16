@@ -1153,7 +1153,8 @@
         const t = this.getTranslations()[this.selectedLang] || TRANSLATIONS.English;
         const watched = this.loadDriverState().watched || {};
 
-        const inLang = assignments.filter(a => (a.language || this.selectedLang) === this.selectedLang);
+        const norm = s => (s || '').trim().toLowerCase();
+const inLang = assignments.filter(a => norm(a.language || this.selectedLang) === norm(this.selectedLang));
 
         inLang.forEach(a => {
           if (watched[a.id]?.done) {
@@ -1315,19 +1316,25 @@
 
         // Server assignments
         let serverAssignments = [];
-        try {
-          const res = await fetch(`${CONFIG.BASE_URL}?mode=assignments`, { cache: 'no-store' });
-          if (res.ok) {
-            const data = await res.json();
-            if (Array.isArray(data.assignments)) {
-              serverAssignments = data.assignments.map(a => {
-                if (!a.source && a.type) a.source = { type: a.type, videoId: a.videoId, url: a.url, driveId: a.driveId };
-                if (!a.language) a.language = this.selectedLang;
-                return a;
-              });
-            }
-          }
-        } catch (e) { console.error('Failed to fetch assignments:', e); }
+try {
+  const q = new URLSearchParams({
+    mode: 'assignments',
+    language: this.selectedLang || '',
+    name: this.driver?.name || '',
+    truck: this.driver?.truck || ''
+  });
+  const res = await fetch(`${CONFIG.BASE_URL}?${q.toString()}`, { cache: 'no-store' });
+  if (res.ok) {
+    const data = await res.json();
+    if (Array.isArray(data.assignments)) {
+      serverAssignments = data.assignments.map(a => {
+        if (!a.source && a.type) a.source = { type: a.type, videoId: a.videoId, url: a.url, driveId: a.driveId };
+        if (!a.language) a.language = this.selectedLang;
+        return a;
+      });
+    }
+  }
+} catch (e) { console.error('Failed to fetch assignments:', e); }
 
         // Merge + dedupe
         const byId = new Map();
@@ -1589,3 +1596,4 @@
   </script>
 </body>
 </html>
+
