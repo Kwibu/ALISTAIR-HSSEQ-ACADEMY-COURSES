@@ -1594,6 +1594,123 @@ try {
       window.app = new DriverTrainingApp();
     });
   </script>
+  <!-- PATCH: Make admin-added videos visible to all drivers by language -->
+<script>
+(function () {
+  // Safety: only run if your app has loaded
+  if (!window.DriverTrainingApp) return;
+
+  /**
+   * NEW: fetch a language-wide catalog from your backend.
+   * Expects GET ?mode=catalog&language=LANG to return:
+   * { videos: [{id,title,language,type,videoId,driveId,url,createdAt}] }
+   */
+  if (!DriverTrainingApp.prototype.fetchCatalog) {
+    DriverTrainingApp.prototype.fetchCatalog = async function (language) {
+      const lang = language || this.selectedLang || 'English';
+      try {
+        const r = await fetch(
+          `${CONFIG.BASE_URL}?mode=catalog&language=${encodeURIComponent(lang)}`,
+          { cache: 'no-store' }
+        );
+        if (!r.ok) return [];
+        const j = await r.json();
+        if (!Array.isArray(j.videos)) return [];
+        // Normalize for your dashboard renderer
+        return j.videos.map(v => ({
+          id: (v.id || '').trim(),
+          title: v.title || 'Training',
+          language: v.language || lang,
+          source: {
+            type: v.type,
+            videoId: v.videoId,
+            driveId: v.driveId,
+            url: v.url
+          },
+          status: 'assigned',
+          assignedAt: v.createdAt || new Date().toISOString().slice(0, 10)
+        })).filter(x => x.id);
+      } catch (e) {
+        console.error('catalog fetch failed', e);
+        return [];
+      }
+    };
+  }
+
+  /**
+   * PATCH: merge (1) driver-specific assignments, (2) global catalog by language,
+   * and (3) local admin videos. Server items take priority, then catalog, then local.
+   * This leaves your render and other logic untouched.
+   */
+  const patched_fetchAssignmentsMerged = async function () {
+    // 1) Local admin videos (device-only) still supported
+    const vmap = this.getVideoLinks();
+    const localLangList = (vmap[this.selectedLang] || []).map(video => ({
+      id: video.id,
+      title: video.title,
+      language: this.selectedLang,
+      source: video,
+      status: 'assigned',
+      assignedAt: new Date().toISOString().slice(0, 10),
+      isAdminAdded: true
+    }));
+
+    // 2) Existing driver-specific assignments from backend (unchanged)
+    let serverAssignments = [];
+    try {
+      const q = new URLSearchParams({
+        mode: 'assignments',
+        language: this.selectedLang || '',
+        name: this.driver?.name || '',
+        truck: this.driver?.truck || ''
+      });
+      const res = await fetch(`${CONFIG.BASE_URL}?${q.toString()}`, { cache: 'no-store' });
+      if (res.ok) {
+        const data = await res.json();
+        if (Array.isArray(data.assignments)) {
+          serverAssignments = data.assignments.map(a => {
+            if (!a.source && a.type) {
+              a.source = { type: a.type, videoId: a.videoId, url: a.url, driveId: a.driveId };
+            }
+            if (!a.language) a.language = this.selectedLang;
+            return a;
+          });
+        }
+      }
+    } catch (e) {
+      console.error('Failed to fetch assignments:', e);
+    }
+
+    // 3) NEW: Global catalog by language from backend
+    let catalogItems = [];
+    try {
+      catalogItems = await this.fetchCatalog(this.selectedLang);
+    } catch (e) {
+      console.error('Failed to fetch catalog:', e);
+    }
+
+    // Merge order: serverAssignments > catalogItems > localLangList
+    const byId = new Map();
+    [...serverAssignments, ...catalogItems, ...localLangList].forEach(a => {
+      if (!a || !a.id) return;
+      const existing = byId.get(a.id) || {};
+      byId.set(a.id, { ...a, ...existing });
+    });
+
+    // Respect your demo purge guards if present
+    return Array.from(byId.values()).filter(a => {
+      const id = (a?.id || '').trim();
+      const title = (a?.title || '').trim();
+      return !DEMO_IDS?.has?.(id) && !DEMO_TITLES?.has?.(title);
+    });
+  };
+
+  // Apply the override without touching the original class body
+  DriverTrainingApp.prototype.fetchAssignmentsMerged = patched_fetchAssignmentsMerged;
+})();
+</script>
+
 </body>
 </html>
+
 
