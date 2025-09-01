@@ -313,17 +313,15 @@
                     <div class="form-group flex-1" style="min-width: 200px;">
                       <label for="videoType" class="form-label">Video Type</label>
                       <select id="videoType" class="form-control" required>
-                        <option value="">Select Type</option>
-                        <option value="youtube">YouTube</option>
-                        <option value="drive">Google Drive</option>
-                        <option value="mp4">MP4 URL</option>
-                        <option value="local">Upload Video</option>
-                      </select>
+  <option value="">Select Type</option>
+  <option value="youtube">YouTube</option>
+  <option value="drive">Google Drive</option>
+  <option value="mp4">MP4 URL</option>
+</select>
                     </div>
                     <div class="form-group flex-1" style="min-width: 200px;">
                       <label id="videoSourceLabel" for="videoId" class="form-label">YouTube ID/URL</label>
                       <input type="text" id="videoId" class="form-control" placeholder="YouTube ID or URL" />
-                      <input type="file" id="videoFile" class="form-control mt-2" accept="video/*" style="display: none;" />
                     </div>
                   </div>
 
@@ -548,7 +546,18 @@
           });
         }
       }
-
+async fetchCatalog(language) {
+  try {
+    const q = new URLSearchParams({ mode: 'catalog', language: language || '' });
+    const res = await fetch(`${CONFIG.BASE_URL}?${q.toString()}`, { cache: 'no-store' });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const data = await res.json();
+    return Array.isArray(data?.catalog) ? data.catalog : (Array.isArray(data) ? data : []);
+  } catch (e) {
+    console.error('Failed to fetch catalog:', e);
+    return [];
+  }
+}
       // ====== DOM INITIALIZATION ======
       initDOM() {
         this.populateLanguageSelect();
@@ -726,88 +735,70 @@
 
         // Admin: video type switch
         $('#videoType').addEventListener('change', () => {
-          const type = $('#videoType').value;
-          $('#videoId').style.display = type === 'local' ? 'none' : 'block';
-          $('#videoFile').style.display = type === 'local' ? 'block' : 'none';
-
-          const label = $('#videoSourceLabel');
-          if (type === 'youtube') label.textContent = 'YouTube ID/URL';
-          else if (type === 'drive') label.textContent = 'Google Drive URL';
-          else if (type === 'mp4') label.textContent = 'MP4 URL';
-          else label.textContent = 'Video File';
-        });
-
+  const type = $('#videoType').value;
+  $('#videoId').style.display = 'block'; // always using a URL/ID now
+  const label = $('#videoSourceLabel');
+  if (type === 'youtube') label.textContent = 'YouTube ID/URL';
+  else if (type === 'drive') label.textContent = 'Google Drive URL';
+  else if (type === 'mp4') label.textContent = 'MP4 URL';
+});
         // Admin: save video
         $('#saveVideoBtn').addEventListener('click', async () => {
-          const lang = $('#adminLangSelect').value;
-          const title = $('#videoTitle').value.trim();
-          const type = $('#videoType').value;
-          const note = $('#videoNoteAdmin').value.trim();
+  const lang  = $('#adminLangSelect').value;
+  const title = $('#videoTitle').value.trim();
+  const type  = $('#videoType').value;
+  const note  = $('#videoNoteAdmin').value.trim();
+  const input = $('#videoId').value.trim();
 
-          if (!lang || !title || !type) {
-            this.showToast('Please fill all required fields');
-            return;
-          }
+  if (!lang || !title || !type) {
+    this.showToast('Please fill all required fields');
+    return;
+  }
 
-          let videoData = { id: this.generateId(), title, type, note };
+  // Build server-ready payload (NO local mode)
+  const videoData = { id: this.generateId(), title, type, note, language: lang };
 
-          try {
-            if (type === 'youtube') {
-              const idOrUrl = $('#videoId').value.trim();
-              const videoId = this.parseYouTubeId(idOrUrl);
-              if (!videoId) { this.showToast('Invalid YouTube ID or URL'); return; }
-              videoData.videoId = videoId;
-            } else if (type === 'drive') {
-              const url = $('#videoId').value.trim();
-              const driveId = this.extractDriveFileId(url);
-              if (!driveId) { this.showToast('Invalid Google Drive link'); return; }
-              videoData.driveId = driveId;
-            } else if (type === 'mp4') {
-              const url = $('#videoId').value.trim();
-              if (!/^https?:\/\//i.test(url)) { this.showToast('Enter a valid MP4 URL'); return; }
-              videoData.url = url;
-            } else if (type === 'local') {
-              const file = $('#videoFile').files?.[0];
-              if (!file) { this.showToast('Choose a video file'); return; }
-              const localKey = videoData.id;
-              try { await this.idbPut(localKey, file); videoData.localKey = localKey; }
-              catch (e) { console.error('Failed to store video:', e); this.showToast('Failed to store video file'); return; }
-            }
+  if (type === 'youtube') {
+    const videoId = this.parseYouTubeId(input);
+    if (!videoId) { this.showToast('Invalid YouTube ID or URL'); return; }
+    videoData.videoId = videoId;
+  } else if (type === 'drive') {
+    const driveId = this.extractDriveFileId(input);
+    if (!driveId) { this.showToast('Invalid Google Drive link'); return; }
+    videoData.driveId = driveId;
+  } else if (type === 'mp4') {
+    if (!/^https?:\/\//i.test(input)) { this.showToast('Enter a valid MP4 URL'); return; }
+    videoData.url = input;
+  } else {
+    this.showToast('Unsupported video type');
+    return;
+  }
 
-            // Save locally
-            const vmap = this.getVideoLinks();
-            const list = (vmap[lang] || []).filter(v => v.id !== videoData.id).concat(videoData);
-            this.setVideoLinksForLang(lang, list);
+  try {
+    // Must reach server so all devices see it
+    const res = await this.postAdminVideo(videoData);
+    if (res?.success === false) throw new Error(res.message || 'Server error');
 
-            // Try sync to server (skip local)
-            if (type !== 'local') {
-              try { await this.postAdminVideo({ language: lang, ...videoData }); } catch (e) { /* offline ok */ }
-            }
+    // Reset form
+    $('#videoTitle').value = '';
+    $('#videoType').value = '';
+    $('#videoId').value = '';
+    $('#videoNoteAdmin').value = '';
 
-            // Reset form
-            $('#videoTitle').value = ''; $('#videoType').value = '';
-            $('#videoId').value = ''; $('#videoFile').value = ''; $('#videoFile').style.display = 'none';
-            $('#videoNoteAdmin').value = '';
+    // Refresh admin list from server catalog
+    await this.renderAdminVideoList(true);
 
-            // Refresh lists
-            this.renderAdminVideoList();
+    // If a driver is currently logged in, re-pull their dashboard
+    if (this.driver?.name && this.driver?.truck) {
+      await this.loadDriverData();
+    }
 
-            if (this.assignments) {
-              const assignment = {
-                id: videoData.id, title, language: lang, source: videoData, status: 'assigned',
-                assignedAt: new Date().toISOString().slice(0, 10), isAdminAdded: true
-              };
-              this.assignments.push(assignment);
-              this.renderDashboard(this.assignments);
-            }
-
-            this.showToast('Training saved successfully');
-          } catch (error) {
-            console.error('Error saving video:', error);
-            this.showToast('Error saving training');
-          }
-        });
-      }
+    this.showToast('Training saved to server');
+  } catch (error) {
+    console.error('Error saving training:', error);
+    this.showToast('Could not save to server. Check connection & try again.');
+  }
+});
 
       // ====== CORE METHODS ======
       async loadDriverData() {
@@ -879,9 +870,8 @@
         $('#activeVideoTitle').textContent = assignment.title;
         this.showLoadingNote(true);
 
-        const vmap = this.getVideoLinks();
-        const meta = (vmap[this.selectedLang] || []).find(v => v.id === assignment.id) || assignment.source || {};
-        this.renderPlayer(meta);
+        const meta = assignment.source || {};
+this.renderPlayer(meta);
       }
 
       renderPlayer(meta) {
@@ -1189,7 +1179,6 @@ const inLang = assignments.filter(a => norm(a.language || this.selectedLang) ===
         const card = document.createElement('div');
         card.className = 'card';
 
-        const localOnly = assignment.source?.type === 'local' ? `<span class="local-only">${t.localOnly}</span>` : '';
         const when = assignment.status === 'completed'
           ? (assignment.completedAt ? ` • ${assignment.completedAt}` : '')
           : (assignment.assignedAt ? ` • ${t.assigned} ${assignment.assignedAt}` : '');
@@ -1197,7 +1186,7 @@ const inLang = assignments.filter(a => norm(a.language || this.selectedLang) ===
         card.innerHTML = `
           <div class="card-body">
             <div class="flex justify-between items-start">
-              <h4>${assignment.title}${localOnly}</h4>
+              <h4>${assignment.title}</h4>
               <span class="badge badge-primary">${assignment.language}</span>
             </div>
             <p class="text-sm text-muted mt-2">
@@ -1215,74 +1204,85 @@ const inLang = assignments.filter(a => norm(a.language || this.selectedLang) ===
         return card;
       }
 
-      renderAdminVideoList() {
-        const vmap = this.getVideoLinks();
-        const container = $('#adminVideoItems');
-        container.innerHTML = '';
+     async renderAdminVideoList(forceRefreshFromServer = false) {
+  const container = $('#adminVideoItems');
+  container.innerHTML = '';
 
-        Object.entries(vmap).forEach(([lang, videos]) => {
-          // Filter out any lingering demos (extra safety)
-          videos = videos.filter(v => !DEMO_IDS.has((v.id || '').trim()) && !DEMO_TITLES.has((v.title || '').trim()));
-          if (!videos.length) return;
+  // Pull catalog for each known language (selected first for speed/UX)
+  const langs = Object.keys(this.getTranslations());
+  const order = [this.selectedLang, ...langs.filter(l => l !== this.selectedLang)];
 
-          const langHeader = document.createElement('h4');
-          langHeader.className = 'mb-2';
-          langHeader.textContent = lang;
-          container.appendChild(langHeader);
+  for (const lang of order) {
+    let videos = [];
+    try {
+      videos = await this.fetchCatalog(lang);
+    } catch (_) {}
 
-          videos.forEach(video => {
-            const item = document.createElement('div');
-            item.className = 'card mb-3';
+    // Filter out demos if constant is present
+    videos = videos.filter(v => !DEMO_IDS?.has?.((v.id || '').trim()) && !DEMO_TITLES?.has?.((v.title || '').trim()));
 
-            const localBadge = video.type === 'local' ? `<span class="local-only">${TRANSLATIONS.English.localOnly}</span>` : '';
+    if (!videos.length) continue;
 
-            item.innerHTML = `
-              <div class="card-body">
-                <div class="flex justify-between items-start">
-                  <h4>${video.title}${localBadge}</h4>
-                  <div class="flex gap-2">
-                    <button class="btn btn-sm btn-muted">Play</button>
-                    <button class="btn btn-sm btn-danger">Delete</button>
-                  </div>
-                </div>
-                <p class="text-sm text-muted mt-1">${video.type} • ${video.id}</p>
-                ${video.note ? `<p class="text-sm mt-2">${video.note}</p>` : ''}
-              </div>
-            `;
+    const langHeader = document.createElement('h4');
+    langHeader.className = 'mb-2';
+    langHeader.textContent = lang;
+    container.appendChild(langHeader);
 
-            const playBtn = item.querySelector('.btn-muted');
-            const deleteBtn = item.querySelector('.btn-danger');
+    videos.forEach(video => {
+      const item = document.createElement('div');
+      item.className = 'card mb-3';
+      item.innerHTML = `
+        <div class="card-body">
+          <div class="flex justify-between items-start">
+            <h4>${video.title}</h4>
+            <div class="flex gap-2">
+              <button class="btn btn-sm btn-muted">Play</button>
+              <button class="btn btn-sm btn-danger">Delete</button>
+            </div>
+          </div>
+          <p class="text-sm text-muted mt-1">${video.source?.type || video.type} • ${video.id}</p>
+          ${video.source?.note ? `<p class="text-sm mt-2">${video.source.note}</p>` : ''}
+        </div>
+      `;
 
-            playBtn.addEventListener('click', () => {
-              this.isAdminViewing = true;
-              const fakeAssignment = {
-                id: video.id, title: video.title, language: lang, source: video,
-                status: 'assigned', assignedAt: new Date().toISOString().slice(0, 10), isAdminAdded: true
-              };
-              this.startAssignment(fakeAssignment);
-            });
+      const playBtn = item.querySelector('.btn-muted');
+      const deleteBtn = item.querySelector('.btn-danger');
 
-            deleteBtn.addEventListener('click', async () => {
-              if (!confirm('Delete this training? This cannot be undone.')) return;
-              const custom = this.loadCustomLangs();
-              if (custom[lang]?.videos) {
-                custom[lang].videos = custom[lang].videos.filter(v => v.id !== video.id);
-                this.saveCustomLangs(custom);
-                if (video.type === 'local' && video.localKey) { try { await this.idbDelete(video.localKey); } catch (e) {} }
-                this.renderAdminVideoList();
-                if (this.assignments) {
-                  this.assignments = this.assignments.filter(a => a.id !== video.id);
-                  this.renderDashboard(this.assignments);
-                }
-                this.showToast('Training deleted');
-              }
-            });
+      playBtn.addEventListener('click', () => {
+        this.isAdminViewing = true;
+        const src = video.source || { type: video.type, videoId: video.videoId, driveId: video.driveId, url: video.url };
+        const fakeAssignment = {
+          id: video.id,
+          title: video.title,
+          language: video.language || lang,
+          source: src,
+          status: 'assigned',
+          assignedAt: video.assignedAt || new Date().toISOString().slice(0, 10)
+        };
+        this.startAssignment(fakeAssignment);
+      });
 
-            container.appendChild(item);
-          });
-        });
-      }
+      deleteBtn.addEventListener('click', async () => {
+        if (!confirm('Delete this training from the server? This cannot be undone.')) return;
+        try {
+          // You need a delete endpoint on your Apps Script, e.g. mode=admin_delete_video&id=...
+          const formData = new FormData();
+          formData.append('mode', 'admin_delete_video');
+          formData.append('id', video.id);
+          await fetch(CONFIG.BASE_URL, { method: 'POST', body: formData });
+          await this.renderAdminVideoList(true);
+          if (this.driver?.name && this.driver?.truck) await this.loadDriverData();
+          this.showToast('Training deleted from server');
+        } catch (e) {
+          console.error(e);
+          this.showToast('Could not delete from server');
+        }
+      });
 
+      container.appendChild(item);
+    });
+  }
+}
       showAdminPanel(show) {
         if (show && !this.isAdminLoggedIn()) return;
         $('#adminPanelBtn').style.display = show ? 'block' : 'none';
@@ -1306,59 +1306,73 @@ const inLang = assignments.filter(a => norm(a.language || this.selectedLang) ===
       }
 
       async fetchAssignmentsMerged() {
-        const vmap = this.getVideoLinks();
+  const vmap = this.getVideoLinks();
 
-        // Local videos for current language
-        const localLangList = (vmap[this.selectedLang] || []).map(video => ({
-          id: video.id, title: video.title, language: this.selectedLang, source: video,
-          status: 'assigned', assignedAt: new Date().toISOString().slice(0, 10), isAdminAdded: true
-        }));
+  const localLangList = (vmap[this.selectedLang] || []).map(video => ({
+    id: video.id, title: video.title, language: this.selectedLang, source: video,
+    status: 'assigned', assignedAt: new Date().toISOString().slice(0, 10), isAdminAdded: true
+  }));
 
-        // Server assignments
-        let serverAssignments = [];
-try {
-  const q = new URLSearchParams({
-    mode: 'assignments',
-    language: this.selectedLang || '',
-    name: this.driver?.name || '',
-    truck: this.driver?.truck || ''
-  });
-  const res = await fetch(`${CONFIG.BASE_URL}?${q.toString()}`, { cache: 'no-store' });
-  if (res.ok) {
-    const data = await res.json();
-    if (Array.isArray(data.assignments)) {
-      serverAssignments = data.assignments.map(a => {
-        if (!a.source && a.type) a.source = { type: a.type, videoId: a.videoId, url: a.url, driveId: a.driveId };
-        if (!a.language) a.language = this.selectedLang;
-        return a;
-      });
-    }
-  }
-} catch (e) { console.error('Failed to fetch assignments:', e); }
+  // NEW: pull catalog from server for the selected language
+  let catalogList = [];
+  try {
+    catalogList = (await this.fetchCatalog(this.selectedLang)).map(v => ({
+      id: v.id,
+      title: v.title,
+      language: v.language || this.selectedLang,
+      source: v.source || { type: v.type, videoId: v.videoId, driveId: v.driveId, url: v.url },
+      status: 'assigned',
+      assignedAt: v.assignedAt || new Date().toISOString().slice(0,10)
+    }));
+  } catch (_) {}
 
-        // Merge + dedupe
-        const byId = new Map();
-        [...serverAssignments, ...localLangList].forEach(a => { if (a) byId.set(a.id, { ...a, ...(byId.get(a.id) || {}) }); });
-
-        // Fallback: load all local across languages if empty
-        if (byId.size === 0) {
-          Object.entries(vmap).forEach(([lang, videos]) => {
-            videos.forEach(video => {
-              byId.set(video.id, {
-                id: video.id, title: video.title, language: lang, source: video,
-                status: 'assigned', assignedAt: new Date().toISOString().slice(0, 10), isAdminAdded: true
-              });
-            });
-          });
-        }
-
-        // FINAL FILTER: remove demo IDs/titles
-        return Array.from(byId.values()).filter(a => {
-          const id = (a?.id || '').trim();
-          const title = (a?.title || '').trim();
-          return !DEMO_IDS.has(id) && !DEMO_TITLES.has(title);
+  // Existing server assignments
+  let serverAssignments = [];
+  try {
+    const q = new URLSearchParams({
+      mode: 'assignments',
+      language: this.selectedLang || '',
+      name: this.driver?.name || '',
+      truck: this.driver?.truck || ''
+    });
+    const res = await fetch(`${CONFIG.BASE_URL}?${q.toString()}`, { cache: 'no-store' });
+    if (res.ok) {
+      const data = await res.json();
+      if (Array.isArray(data.assignments)) {
+        serverAssignments = data.assignments.map(a => {
+          if (!a.source && a.type) a.source = { type: a.type, videoId: a.videoId, url: a.url, driveId: a.driveId };
+          if (!a.language) a.language = this.selectedLang;
+          return a;
         });
       }
+    }
+  } catch (e) { console.error('Failed to fetch assignments:', e); }
+
+  // Merge + dedupe (server wins, then catalog, then local)
+  const byId = new Map();
+  [...serverAssignments, ...catalogList, ...localLangList].forEach(a => {
+    if (!a) return;
+    // prefer whichever already stored, but don't lose fields
+    byId.set(a.id, { ...(byId.get(a.id) || {}), ...a });
+  });
+
+  if (byId.size === 0) {
+    Object.entries(vmap).forEach(([lang, videos]) => {
+      videos.forEach(video => {
+        byId.set(video.id, {
+          id: video.id, title: video.title, language: lang, source: video,
+          status: 'assigned', assignedAt: new Date().toISOString().slice(0, 10), isAdminAdded: true
+        });
+      });
+    });
+  }
+
+  return Array.from(byId.values()).filter(a => {
+    const id = (a?.id || '').trim();
+    const title = (a?.title || '').trim();
+    return !DEMO_IDS.has(id) && !DEMO_TITLES.has(title);
+  });
+}
 
       async fetchHistory(name, truck) {
         try {
@@ -1593,124 +1607,9 @@ try {
     document.addEventListener('DOMContentLoaded', () => {
       window.app = new DriverTrainingApp();
     });
-  </script>
-  <!-- PATCH: Make admin-added videos visible to all drivers by language -->
-<script>
-(function () {
-  // Safety: only run if your app has loaded
-  if (!window.DriverTrainingApp) return;
-
-  /**
-   * NEW: fetch a language-wide catalog from your backend.
-   * Expects GET ?mode=catalog&language=LANG to return:
-   * { videos: [{id,title,language,type,videoId,driveId,url,createdAt}] }
-   */
-  if (!DriverTrainingApp.prototype.fetchCatalog) {
-    DriverTrainingApp.prototype.fetchCatalog = async function (language) {
-      const lang = language || this.selectedLang || 'English';
-      try {
-        const r = await fetch(
-          `${CONFIG.BASE_URL}?mode=catalog&language=${encodeURIComponent(lang)}`,
-          { cache: 'no-store' }
-        );
-        if (!r.ok) return [];
-        const j = await r.json();
-        if (!Array.isArray(j.videos)) return [];
-        // Normalize for your dashboard renderer
-        return j.videos.map(v => ({
-          id: (v.id || '').trim(),
-          title: v.title || 'Training',
-          language: v.language || lang,
-          source: {
-            type: v.type,
-            videoId: v.videoId,
-            driveId: v.driveId,
-            url: v.url
-          },
-          status: 'assigned',
-          assignedAt: v.createdAt || new Date().toISOString().slice(0, 10)
-        })).filter(x => x.id);
-      } catch (e) {
-        console.error('catalog fetch failed', e);
-        return [];
-      }
-    };
-  }
-
-  /**
-   * PATCH: merge (1) driver-specific assignments, (2) global catalog by language,
-   * and (3) local admin videos. Server items take priority, then catalog, then local.
-   * This leaves your render and other logic untouched.
-   */
-  const patched_fetchAssignmentsMerged = async function () {
-    // 1) Local admin videos (device-only) still supported
-    const vmap = this.getVideoLinks();
-    const localLangList = (vmap[this.selectedLang] || []).map(video => ({
-      id: video.id,
-      title: video.title,
-      language: this.selectedLang,
-      source: video,
-      status: 'assigned',
-      assignedAt: new Date().toISOString().slice(0, 10),
-      isAdminAdded: true
-    }));
-
-    // 2) Existing driver-specific assignments from backend (unchanged)
-    let serverAssignments = [];
-    try {
-      const q = new URLSearchParams({
-        mode: 'assignments',
-        language: this.selectedLang || '',
-        name: this.driver?.name || '',
-        truck: this.driver?.truck || ''
-      });
-      const res = await fetch(`${CONFIG.BASE_URL}?${q.toString()}`, { cache: 'no-store' });
-      if (res.ok) {
-        const data = await res.json();
-        if (Array.isArray(data.assignments)) {
-          serverAssignments = data.assignments.map(a => {
-            if (!a.source && a.type) {
-              a.source = { type: a.type, videoId: a.videoId, url: a.url, driveId: a.driveId };
-            }
-            if (!a.language) a.language = this.selectedLang;
-            return a;
-          });
-        }
-      }
-    } catch (e) {
-      console.error('Failed to fetch assignments:', e);
-    }
-
-    // 3) NEW: Global catalog by language from backend
-    let catalogItems = [];
-    try {
-      catalogItems = await this.fetchCatalog(this.selectedLang);
-    } catch (e) {
-      console.error('Failed to fetch catalog:', e);
-    }
-
-    // Merge order: serverAssignments > catalogItems > localLangList
-    const byId = new Map();
-    [...serverAssignments, ...catalogItems, ...localLangList].forEach(a => {
-      if (!a || !a.id) return;
-      const existing = byId.get(a.id) || {};
-      byId.set(a.id, { ...a, ...existing });
-    });
-
-    // Respect your demo purge guards if present
-    return Array.from(byId.values()).filter(a => {
-      const id = (a?.id || '').trim();
-      const title = (a?.title || '').trim();
-      return !DEMO_IDS?.has?.(id) && !DEMO_TITLES?.has?.(title);
-    });
-  };
-
-  // Apply the override without touching the original class body
-  DriverTrainingApp.prototype.fetchAssignmentsMerged = patched_fetchAssignmentsMerged;
-})();
-</script>
-
+ </script>
 </body>
 </html>
+
 
 
